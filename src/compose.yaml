@@ -1,0 +1,13 @@
+﻿services:
+  DynamicProxy:
+    image: DynamicProxy
+    build:
+      context: .
+      dockerfile: DynamicProxy/Dockerfile
+
+  webapplication1:
+    image: webapplication1
+    build:
+      context: .
+      dockerfile: WebApplication1/Dockerfile
+
