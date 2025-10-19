@@ -3,21 +3,26 @@ using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
 using DomainGateway.ConfigurationProviders.FileSystem;
 using DomainGateway.Contracts;
+using DomainGateway.Database;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Host.UseDefaultServiceProvider(config => config.ValidateOnBuild = true);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 var configurationSection = builder.Configuration.GetSection("DomainGatewayConfiguration");
 builder.Services.Configure<DomainGatewaySetup>(configurationSection);
 var configuration = configurationSection.Get<DomainGatewaySetup>()!;
+
+builder.Services.AddDbContext<DomainGatewayDbContext>(options => DomainGatewayDbContext.Configure(options, connectionString));
 
 // Add rate limiting configuration
 builder.Services.AddRateLimiter(options =>
 {
 	options.AddPolicy("SlidingWindowPerClientId", context =>
 	{
-		// Extract clientid from header, fallback unknown if not present
+		// Extract clientId from header, fallback unknown if not present
 		var clientId = context.Request.Headers[configuration.ClientIdHeaderName].FirstOrDefault() ?? "unknown";
 		var configProvider = context.RequestServices.GetRequiredService<IGatewayConfigurationProvider>();
 		var config = configProvider.GetRateLimiterConfiguration().ConfigurationByClient.TryGetValue(clientId, out var configValue)
@@ -67,6 +72,12 @@ builder.Services.AddReverseProxy();
 builder.Services.AddControllers();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+	var db = scope.ServiceProvider.GetRequiredService<DomainGatewayDbContext>();
+	db.Database.Migrate();
+}
 
 app.MapDefaultEndpoints();
 

@@ -3,7 +3,7 @@ namespace DomainGateway.Models;
 public class DomainGatewaySetup
 {
 	public required string ClientIdHeaderName { get; init; }
-	public bool ExposeConfigurationsEndpoint { get; init; } = false;
+	public bool ExposeConfigurationsEndpoint { get; init; }
 	public string ConfigurationsEndpointPrefix { get; init; } = "/configurations";
 	public AwsS3RepositorySetup? AwsS3Repository { get; init; }
 	public FileSystemRepositorySetup? FileSystemRepository { get; init; }
