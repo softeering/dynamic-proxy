@@ -1,0 +1,19 @@
+{
+	"DisableThrottling": false,
+	"ConfigurationByClient": {
+		"unknown": {
+			"Disabled": false,
+			"PermitLimit": 5,
+			"PermitLimitWindow": "00:00:10",
+			"SegmentsPerWindow": 1,
+			"QueueLimit": 2
+		},
+		"test-client": {
+			"Disabled": false,
+			"PermitLimit": 20,
+			"PermitLimitWindow": "00:00:10",
+			"SegmentsPerWindow": 2,
+			"QueueLimit": 50
+		}
+	}
+}

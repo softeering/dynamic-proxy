@@ -1,9 +1,0 @@
-@baseUrl = http://localhost:5001
-
-### HTTP Default route mapping
-GET {{baseUrl}}
-Client-Id: "test-client"
-
-### gRPC Default route mapping
-GRPC localhost:8080
-Client-Id: "test-client"

@@ -1,13 +1,6 @@
 ﻿services:
-  DynamicProxy:
-    image: DynamicProxy
+  DomainGateway:
+    image: DomainGateway
     build:
       context: .
-      dockerfile: DynamicProxy/Dockerfile
-
-  webapplication1:
-    image: webapplication1
-    build:
-      context: .
-      dockerfile: WebApplication1/Dockerfile
-
+      dockerfile: DomainGateway/Dockerfile

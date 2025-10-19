@@ -1,0 +1,27 @@
+@baseUrl = http://localhost:5001
+@testService = "service-test"
+
+### HTTP Default route mapping
+GET {{baseUrl}}
+Client-Id: "test-client"
+
+### gRPC Default route mapping
+GRPC localhost:8080
+Client-Id: "test-client"
+
+### Servcie discovery - register instance
+POST {{baseUrl}}/service-discovery/register
+Content-Type: application/json
+
+{
+  "serviceName": {{testService}},
+  "instanceId": "instance-1",
+  "host": "localhost",
+  "port": 6000,
+  "metadata": {
+    "version": "1.0.0"
+  }
+}
+
+### Service discovery - list instances
+GET {{baseUrl}}/service-discovery/instances/{{testService}}
