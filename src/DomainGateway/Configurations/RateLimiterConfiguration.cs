@@ -1,9 +1,11 @@
-namespace DomainGateway.Models;
+namespace DomainGateway.Configurations;
 
 public class RateLimiterConfiguration
 {
+	public static readonly RateLimiterConfiguration Default = new() { DisableThrottling = true };
+
 	public bool DisableThrottling { get; init; }
-	public IDictionary<string, ThrottlingConfig> ConfigurationByClient { get; set; } = new Dictionary<string, ThrottlingConfig>();
+	public IDictionary<string, ThrottlingConfig> ConfigurationByClient { get; init; } = new Dictionary<string, ThrottlingConfig>();
 }
 
 public class ThrottlingConfig

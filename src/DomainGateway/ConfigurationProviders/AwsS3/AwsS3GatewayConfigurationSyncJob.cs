@@ -1,8 +1,9 @@
-using DomainGateway.Contracts;
-using DomainGateway.Models;
-using Microsoft.Extensions.Options;
+using DomainGateway.Configurations;
 
 namespace DomainGateway.ConfigurationProviders.AwsS3;
+
+using Contracts;
+using Microsoft.Extensions.Options;
 
 public class AwsS3ProxyConfigurationSyncJob(
 	ILogger<AwsS3ProxyConfigurationSyncJob> logger,

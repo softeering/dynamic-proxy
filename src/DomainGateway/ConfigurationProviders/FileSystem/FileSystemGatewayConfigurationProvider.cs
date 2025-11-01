@@ -1,18 +1,19 @@
-using System.Text.Json;
-using DomainGateway.Contracts;
-using DomainGateway.Infrastructure;
-using DomainGateway.Models;
-using Yarp.ReverseProxy.Configuration;
+using DomainGateway.Configurations;
 
 namespace DomainGateway.ConfigurationProviders.FileSystem;
+
+using System.Text.Json;
+using Contracts;
+using Infrastructure;
+using Yarp.ReverseProxy.Configuration;
 
 public class FileSystemGatewayConfigurationProvider(
 	ILogger<FileSystemGatewayConfigurationProvider> logger,
 	FileSystemRepositorySetup setup) : IGatewayConfigurationProvider, IProxyConfigProvider
 {
-	private readonly AtomicReference<ProxyConfig> _proxyConfig = new();
-	private readonly AtomicReference<RateLimiterConfiguration> _rateLimiterConfig = new();
-	private readonly AtomicReference<ServiceDiscoveryConfiguration> _serviceDiscoveryConfig = new();
+	private readonly AtomicReference<ProxyConfig> _proxyConfig = new(ProxyConfig.Default);
+	private readonly AtomicReference<RateLimiterConfiguration> _rateLimiterConfig = new(RateLimiterConfiguration.Default);
+	private readonly AtomicReference<ServiceDiscoveryConfiguration> _serviceDiscoveryConfig = new(ServiceDiscoveryConfiguration.Default);
 	
 	public ProxyConfig GetProxyConfiguration()
 	{

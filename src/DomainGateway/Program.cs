@@ -1,21 +1,27 @@
-using DomainGateway.Models;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
+using DomainGateway.ConfigurationProviders.AwsS3;
+using DomainGateway.ConfigurationProviders.AzBlobStorage;
 using DomainGateway.ConfigurationProviders.FileSystem;
+using DomainGateway.Configurations;
 using DomainGateway.Contracts;
 using DomainGateway.Database;
+using DomainGateway.Infrastructure;
+using DomainGateway.ServiceDiscovery;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using SoftEEring.Core.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Host.UseDefaultServiceProvider(config => config.ValidateOnBuild = true);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 var configurationSection = builder.Configuration.GetSection("DomainGatewayConfiguration");
 builder.Services.Configure<DomainGatewaySetup>(configurationSection);
 var configuration = configurationSection.Get<DomainGatewaySetup>()!;
 
-builder.Services.AddDbContext<DomainGatewayDbContext>(options => DomainGatewayDbContext.Configure(options, connectionString));
+builder.Services.AddDbContext<DomainGatewayDbContext>();
 
 // Add rate limiting configuration
 builder.Services.AddRateLimiter(options =>
@@ -60,7 +66,12 @@ if (configuration.FileSystemRepository is not null)
 else if (configuration.AwsS3Repository is not null)
 {
 	// TODO add some logging
-	// builder.Services.AddAwsS3Provider(configuration.AwsS3Repository);
+	builder.Services.AddAwsS3Provider(configuration.AwsS3Repository);
+}
+else if (configuration.AzBlobStorageRepository is not null)
+{
+	// TODO add some logging
+	builder.Services.AddAzBlobStorageProvider(configuration.AzBlobStorageRepository);
 }
 else
 {
@@ -68,34 +79,40 @@ else
 }
 
 builder.Services.AddReverseProxy();
-
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IServiceDiscoveryInstancesRepository, DatabaseInstancesRepository>();
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy(
+		ClientIdHeaderRequirementHandler.PolicyName,
+		policy => policy.Requirements.Add(new ClientIdHeaderRequirement(configuration.ClientIdHeaderName))
+	);
+});
+builder.Services.AddSingleton<IAuthorizationHandler, ClientIdHeaderRequirementHandler>();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-	var db = scope.ServiceProvider.GetRequiredService<DomainGatewayDbContext>();
-	db.Database.Migrate();
-}
+// migrate database on startup
+app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Use(_ => dbContext.Database.Migrate());
+// initialize configurations repository on startup
+await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshProxyConfigurationAsync();
+await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshRateLimiterConfigurationAsync();
+await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshServiceDiscoveryConfigurationAsync();
 
+app.UseExceptionHandler();
 app.MapDefaultEndpoints();
-
-// Use rate limiting middleware globally
 app.UseRateLimiter();
-
 app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
 
 if (configuration.ExposeConfigurationsEndpoint)
 {
-	app.MapGet($"/{configuration.ConfigurationsEndpointPrefix.TrimEnd('/')}/setup",
-		(IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
-	app.MapGet($"/{configuration.ConfigurationsEndpointPrefix.TrimEnd('/')}/proxy",
-		(IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
-	app.MapGet($"/{configuration.ConfigurationsEndpointPrefix.TrimEnd('/')}/ratelimiter",
-		(IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
-	app.MapGet($"/{configuration.ConfigurationsEndpointPrefix.TrimEnd('/')}/servicediscovery",
-		(IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
+	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/');
+	app.MapGet($"/{prefix}/setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
+	app.MapGet($"/{prefix}/proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
+	app.MapGet($"/{prefix}/ratelimiter", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
+	app.MapGet($"/{prefix}/servicediscovery", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
 }
 
 app.MapGet("/test/info", () => Results.Ok(new

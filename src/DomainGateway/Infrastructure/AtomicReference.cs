@@ -2,17 +2,13 @@ namespace DomainGateway.Infrastructure;
 
 using System.Threading;
 
-public class AtomicReference<T> where T : class
+public class AtomicReference<T>
 {
 	private T? _value;
 
 	public AtomicReference(T value)
 	{
 		this._value = value;
-	}
-
-	public AtomicReference()
-	{
 	}
 
 	public T Value

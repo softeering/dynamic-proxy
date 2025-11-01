@@ -1,8 +1,9 @@
-using DomainGateway.Contracts;
-using DomainGateway.Models;
-using Yarp.ReverseProxy.Configuration;
+using DomainGateway.Configurations;
 
 namespace DomainGateway.ConfigurationProviders.FileSystem;
+
+using Contracts;
+using Yarp.ReverseProxy.Configuration;
 
 public static class Extensions
 {

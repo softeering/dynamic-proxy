@@ -1,28 +1,14 @@
 {
-  "Routes": [
-    {
-      "RouteId": "defaultRoute",
-      "ClusterId": "exampleCluster",
-      "Match": {
-        "Path": "/"
-      }
-    },
-    {
-      "RouteId": "infoRoute",
-      "ClusterId": "exampleCluster",
-      "Match": {
-        "Path": "/info"
-      }
-    }
-  ],
-  "Clusters": [
-    {
-      "ClusterId": "exampleCluster",
-      "Destinations": {
-        "exampleDestination": {
-          "Address": "http://localhost:5102/test/info"
-        }
-      }
-    }
-  ]
+	"MaxHeartbeatIntervalMiss": 3,
+	"AllowedClients": [
+		"test-client"
+	],
+	"RegisteredServices": [
+		{
+			"Name": "example-service",
+			"Description": "An example service for demonstration purposes.",
+			"OwnerEmail": "...@...com",
+			"AutoDeregistration": "DryRun"
+		}
+	]
 }

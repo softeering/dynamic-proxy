@@ -1,27 +1,50 @@
-@baseUrl = http://localhost:5001
-@testService = "service-test"
+@baseUrl = https://localhost:5001/api
+@testService = service-test
 
 ### HTTP Default route mapping
 GET {{baseUrl}}
-Client-Id: "test-client"
+Client-Id: test-client
 
 ### gRPC Default route mapping
 GRPC localhost:8080
-Client-Id: "test-client"
+Client-Id: test-client
 
 ### Servcie discovery - register instance
-POST {{baseUrl}}/service-discovery/register
+POST {{baseUrl}}/servicediscovery/{{testService}}/register
 Content-Type: application/json
+Client-Id: test-client
 
 {
-  "serviceName": {{testService}},
+  "serviceName": "{{testService}}",
   "instanceId": "instance-1",
+  "serviceVersion": "1.0.0",
   "host": "localhost",
   "port": 6000,
   "metadata": {
-    "version": "1.0.0"
+    "az": "us-east-1a"
   }
 }
 
 ### Service discovery - list instances
-GET {{baseUrl}}/service-discovery/instances/{{testService}}
+GET {{baseUrl}}/servicediscovery/{{testService}}/instances
+Client-Id: test-client
+
+### Servcie discovery - heartbeat
+PUT {{baseUrl}}/servicediscovery/{{testService}}/ping
+Content-Type: application/json
+Client-Id: test-client
+
+{
+  "serviceName": "{{testService}}",
+  "instanceId": "instance-1",
+  "serviceVersion": "1.0.1",
+  "host": "localhost",
+  "port": 6000,
+  "metadata": {
+    "az": "us-east-1a"
+  }
+}
+
+### Servcie discovery - heartbeat
+DELETE {{baseUrl}}/servicediscovery/{{testService}}/instance-1
+Client-Id: test-client
