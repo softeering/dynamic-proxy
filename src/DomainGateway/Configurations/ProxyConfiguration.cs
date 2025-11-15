@@ -1,8 +1,8 @@
-namespace DomainGateway.Configurations;
-
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Configuration;
+
+namespace DomainGateway.Configurations;
 
 public class ProxyConfig : IProxyConfig
 {

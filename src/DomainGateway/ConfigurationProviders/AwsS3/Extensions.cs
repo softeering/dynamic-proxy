@@ -1,11 +1,10 @@
 using DomainGateway.Configurations;
-
-namespace DomainGateway.ConfigurationProviders.AwsS3;
-
 using Amazon;
 using Amazon.S3;
-using Contracts;
+using DomainGateway.Contracts;
 using Yarp.ReverseProxy.Configuration;
+
+namespace DomainGateway.ConfigurationProviders.AwsS3;
 
 public static class Extensions
 {

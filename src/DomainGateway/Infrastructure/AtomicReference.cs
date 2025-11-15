@@ -1,7 +1,5 @@
 namespace DomainGateway.Infrastructure;
 
-using System.Threading;
-
 public class AtomicReference<T>
 {
 	private T? _value;

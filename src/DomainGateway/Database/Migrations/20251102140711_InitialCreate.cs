@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -19,6 +20,8 @@ namespace DomainGateway.Database.Migrations
                     ServiceVersion = table.Column<string>(type: "TEXT", nullable: true),
                     Host = table.Column<string>(type: "TEXT", nullable: false),
                     Port = table.Column<int>(type: "INTEGER", nullable: false),
+                    RegistrationTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    LastSeenTime = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     MetadataValue = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>

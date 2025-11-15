@@ -1,11 +1,10 @@
 using DomainGateway.Configurations;
+using System.Text.Json;
+using DomainGateway.Contracts;
+using DomainGateway.Infrastructure;
+using Yarp.ReverseProxy.Configuration;
 
 namespace DomainGateway.ConfigurationProviders.FileSystem;
-
-using System.Text.Json;
-using Contracts;
-using Infrastructure;
-using Yarp.ReverseProxy.Configuration;
 
 public class FileSystemGatewayConfigurationProvider(
 	ILogger<FileSystemGatewayConfigurationProvider> logger,

@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
 using DomainGateway.ConfigurationProviders.AwsS3;
@@ -82,7 +81,7 @@ builder.Services.AddReverseProxy();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
-builder.Services.AddScoped<IServiceDiscoveryInstancesRepository, DatabaseInstancesRepository>();
+builder.Services.AddScoped<IServiceDiscoveryInstancesRepository, InstancesDatabaseRepository>();
 builder.Services.AddAuthorization(options =>
 {
 	options.AddPolicy(
@@ -91,11 +90,12 @@ builder.Services.AddAuthorization(options =>
 	);
 });
 builder.Services.AddSingleton<IAuthorizationHandler, ClientIdHeaderRequirementHandler>();
+builder.Services.AddHostedService<InstanceCleanUpJob>();
 
 var app = builder.Build();
 
 // migrate database on startup
-app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Use(_ => dbContext.Database.Migrate());
+app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ => dbContext.Database.Migrate());
 // initialize configurations repository on startup
 await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshProxyConfigurationAsync();
 await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshRateLimiterConfigurationAsync();

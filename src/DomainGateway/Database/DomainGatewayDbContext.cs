@@ -1,7 +1,7 @@
-namespace DomainGateway.Database;
-
-using ServiceDiscovery;
+using DomainGateway.ServiceDiscovery;
 using Microsoft.EntityFrameworkCore;
+
+namespace DomainGateway.Database;
 
 /**
  * EF migration

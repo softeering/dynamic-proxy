@@ -1,10 +1,9 @@
 using DomainGateway.Configurations;
+using Amazon.S3;
+using DomainGateway.Contracts;
+using Yarp.ReverseProxy.Configuration;
 
 namespace DomainGateway.ConfigurationProviders.AwsS3;
-
-using Amazon.S3;
-using Contracts;
-using Yarp.ReverseProxy.Configuration;
 
 public class AwsS3ConfigurationProvider(
 	ILogger<AwsS3ConfigurationProvider> logger,
@@ -33,7 +32,6 @@ public class AwsS3ConfigurationProvider(
 	{
 		return new ServiceDiscoveryConfiguration()
 		{
-			MaxHeartbeatIntervalMiss = 3,
 			RegisteredServices = []
 		};
 	}

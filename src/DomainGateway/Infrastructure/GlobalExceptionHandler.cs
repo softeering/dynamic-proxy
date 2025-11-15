@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Http.Extensions;
-
-namespace DomainGateway.Infrastructure;
-
 using System.Security.Authentication;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+
+namespace DomainGateway.Infrastructure;
 
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IProblemDetailsService problemDetailsService) : IExceptionHandler
 {

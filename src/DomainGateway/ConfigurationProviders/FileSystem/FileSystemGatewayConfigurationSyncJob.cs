@@ -1,9 +1,8 @@
 using DomainGateway.Configurations;
+using DomainGateway.Contracts;
+using Microsoft.Extensions.Options;
 
 namespace DomainGateway.ConfigurationProviders.FileSystem;
-
-using Contracts;
-using Microsoft.Extensions.Options;
 
 public class FileSystemGatewayConfigurationSyncJob(
 	ILogger<FileSystemGatewayConfigurationSyncJob> logger,

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using SoftEEring.Core.Helpers;
 
 namespace DomainGateway.ServiceDiscovery;
@@ -24,10 +23,12 @@ public class ServiceInstanceEntity
 {
 	public required string ServiceName { get; init; }
 	public required string InstanceId { get; init; }
-	public string? ServiceVersion { get; init; }
-	public required string Host { get; init; }
-	public required int Port { get; init; }
-	public string? MetadataValue { get; init; }
+	public required string? ServiceVersion { get; set; }
+	public required string Host { get; set; }
+	public required int Port { get; set; }
+	public DateTimeOffset RegistrationTime { get; set; } = DateTimeOffset.UtcNow;
+	public DateTimeOffset LastSeenTime { get; set; } = DateTimeOffset.UtcNow;
+	public string? MetadataValue { get; set; }
 
 	public ServiceInstance ToServiceInstance()
 	{

@@ -1,5 +1,4 @@
 {
-	"MaxHeartbeatIntervalMiss": 3,
 	"AllowedClients": [
 		"test-client"
 	],
@@ -8,6 +7,8 @@
 			"Name": "example-service",
 			"Description": "An example service for demonstration purposes.",
 			"OwnerEmail": "...@...com",
+			"InstancesHeartbeatInterval": 30,
+			"MaxHeartbeatIntervalMiss": 3,
 			"AutoDeregistration": "DryRun"
 		}
 	]

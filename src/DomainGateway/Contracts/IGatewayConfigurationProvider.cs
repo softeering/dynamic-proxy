@@ -1,6 +1,6 @@
-namespace DomainGateway.Contracts;
-
 using DomainGateway.Configurations;
+
+namespace DomainGateway.Contracts;
 
 public interface IGatewayConfigurationProvider
 {
