@@ -1,4 +1,6 @@
-﻿namespace DomainGateway.Tests;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace DomainGateway.Tests;
 
 [TestClass]
 public sealed class Test1

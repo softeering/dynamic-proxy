@@ -1,39 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>DomainGateway</RootNamespace>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RootNamespace>DomainGateway</RootNamespace>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
+	<ItemGroup>
+		<Content Include="..\.dockerignore">
+			<Link>.dockerignore</Link>
+		</Content>
+	</ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="AWSSDK.S3" Version="4.0.11.3" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-      <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.9" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-      <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0" />
-      <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
-      <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
-      <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
-      <PackageReference Include="SoftEEring.Core" Version="2.7.1" />
-      <PackageReference Include="Yarp.ReverseProxy" Version="2.3.0" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AWSSDK.S3" Version="4.0.11.3"/>
+		<PackageReference Include="Microsoft.AspNetCore.App.Internal.Assets" Version="10.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0"/>
+		<PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.9"/>
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4"/>
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.14.0"/>
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0"/>
+		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0"/>
+		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0"/>
+		<PackageReference Include="SoftEEring.Core" Version="2.7.1"/>
+		<PackageReference Include="Yarp.ReverseProxy" Version="2.3.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0"/>
+	</ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\DomainGateway.ServiceDefaults\DomainGateway.ServiceDefaults.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\DomainGateway.Client\DomainGateway.Client.csproj" />
+		<ProjectReference Include="..\DomainGateway.ServiceDefaults\DomainGateway.ServiceDefaults.csproj"/>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AdditionalFiles Include="Components\App.razor" />
+	  <AdditionalFiles Include="Components\Pages\Error.razor" />
+	  <AdditionalFiles Include="Components\_Imports.razor" />
+	</ItemGroup>
 
 </Project>

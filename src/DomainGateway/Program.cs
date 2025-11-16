@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
+using DomainGateway.Components;
 using DomainGateway.ConfigurationProviders.AwsS3;
 using DomainGateway.ConfigurationProviders.AzBlobStorage;
 using DomainGateway.ConfigurationProviders.FileSystem;
@@ -14,7 +15,7 @@ using SoftEEring.Core.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+builder.AddServiceDefaults().Services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
 builder.Host.UseDefaultServiceProvider(config => config.ValidateOnBuild = true);
 var configurationSection = builder.Configuration.GetSection("DomainGatewayConfiguration");
 builder.Services.Configure<DomainGatewaySetup>(configurationSection);
@@ -37,7 +38,7 @@ builder.Services.AddRateLimiter(options =>
 		if (config.Disabled)
 			return RateLimitPartition.GetNoLimiter(clientId);
 
-		return RateLimitPartition.GetSlidingWindowLimiter(clientId, key => new SlidingWindowRateLimiterOptions
+		return RateLimitPartition.GetSlidingWindowLimiter(clientId, _ => new SlidingWindowRateLimiterOptions
 		{
 			PermitLimit = config.PermitLimit,
 			Window = config.PermitLimitWindow,
@@ -108,12 +109,33 @@ app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
 
 if (configuration.ExposeConfigurationsEndpoint)
 {
-	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/');
-	app.MapGet($"/{prefix}/setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
-	app.MapGet($"/{prefix}/proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
-	app.MapGet($"/{prefix}/ratelimiter", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
-	app.MapGet($"/{prefix}/servicediscovery", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
+	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/') + "/";
+	app.MapGet($"/{prefix}setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
+	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
+	app.MapGet($"/{prefix}ratelimiter", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
+	app.MapGet($"/{prefix}servicediscovery", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
 }
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+	app.UseWebAssemblyDebugging();
+}
+else
+{
+	app.UseExceptionHandler("/Error", createScopeForErrors: true);
+	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+	app.UseHsts();
+}
+
+app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+app.UseHttpsRedirection();
+app.UseAntiforgery();
+
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+	.AddInteractiveWebAssemblyRenderMode()
+	.AddAdditionalAssemblies(typeof(DomainGateway.Client._Imports).Assembly);
 
 app.MapGet("/test/info", () => Results.Ok(new
 {
@@ -125,3 +147,20 @@ app.MapGet("/test/info", () => Results.Ok(new
 app.MapControllers();
 
 await app.RunAsync();
+
+
+/*
+
+using DomainGateway.Client.Pages;
+   using DomainGateway.Components;
+
+   var builder = WebApplication.CreateBuilder(args);
+
+   // Add services to the container.
+   builder.Services.AddRazorComponents()
+    .AddInteractiveWebAssemblyComponents();
+
+   var app = builder.Build();
+
+
+*/
