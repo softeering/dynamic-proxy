@@ -1,28 +1,51 @@
 {
-  "Routes": [
-    {
-      "RouteId": "defaultRoute",
-      "ClusterId": "exampleCluster",
-      "Match": {
-        "Path": "/"
-      }
-    },
-    {
-      "RouteId": "infoRoute",
-      "ClusterId": "exampleCluster",
-      "Match": {
-        "Path": "/info"
-      }
-    }
-  ],
-  "Clusters": [
-    {
-      "ClusterId": "exampleCluster",
-      "Destinations": {
-        "exampleDestination": {
-          "Address": "http://localhost:5102/test/info"
-        }
-      }
-    }
-  ]
+	"Routes": [
+		{
+			"RouteId": "infoRoute",
+			"ClusterId": "infoCluster",
+			"Match": {
+				"Path": "/info"
+			}
+		},
+		{
+			"RouteId": "weatherForecastRoute",
+			"ClusterId": "weatherForecastCluster",
+			"Match": {
+				"Path": "/api/weather"
+			}
+		},
+		{
+			"RouteId": "exchangeRateRoute",
+			"ClusterId": "exchangeRateCluster",
+			"Match": {
+				"Path": "/api/exchangerate"
+			}
+		}
+	],
+	"Clusters": [
+		{
+			"ClusterId": "infoCluster",
+			"Destinations": {
+				"exampleDestination": {
+					"Address": "https://localhost:5001/test/info"
+				}
+			}
+		},
+		{
+			"ClusterId": "weatherForecastCluster",
+			"Destinations": {
+				"exampleDestination": {
+					"Address": "https://localhost:7002"
+				}
+			}
+		},
+		{
+			"ClusterId": "exchangeRateCluster",
+			"Destinations": {
+				"exampleDestination": {
+					"Address": "https://localhost:8002"
+				}
+			}
+		}
+	]
 }

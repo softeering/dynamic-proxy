@@ -13,7 +13,7 @@ public class DomainGatewaySetup
 
 public class FileSystemRepositorySetup
 {
-	public TimeSpan ConfigurationsRefreshInterval { get; init; } = TimeSpan.FromSeconds(30);
+	public TimeSpan ConfigurationsRefreshInterval { get; init; } = TimeSpan.FromMinutes(5);
 	
 	public required string ProxyConfigurationFilePath { get; init; }
 	public required string RateLimiterConfigurationFilePath { get; init; }
@@ -24,7 +24,7 @@ public class AwsS3RepositorySetup
 {
 	public required string Region { get; init; }
 	public required string Bucket { get; init; }
-	public TimeSpan ConfigurationsRefreshInterval { get; init; } = TimeSpan.FromSeconds(30);
+	public TimeSpan ConfigurationsRefreshInterval { get; init; } = TimeSpan.FromMinutes(5);
 	
 	public required string ProxyConfigurationFileKey { get; init; }
 	public string ProxyConfigurationSourceKey => $"{this.Bucket}/{this.ProxyConfigurationFileKey}";
@@ -40,7 +40,7 @@ public class AzBlobStorageRepositorySetup
 {
 	public required string Region { get; init; }
 	public required string Bucket { get; init; }
-	public TimeSpan ConfigurationsRefreshInterval { get; init; } = TimeSpan.FromSeconds(30);
+	public TimeSpan ConfigurationsRefreshInterval { get; init; } = TimeSpan.FromMinutes(5);
 	
 	public required string ProxyConfigurationFileKey { get; init; }
 	public string ProxyConfigurationSourceKey => $"{this.Bucket}/{this.ProxyConfigurationFileKey}";

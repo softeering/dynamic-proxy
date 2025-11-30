@@ -1,24 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <Sdk Name="Aspire.AppHost.Sdk" Version="9.5.1"/>
+	<Sdk Name="Aspire.AppHost.Sdk" Version="9.5.1"/>
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <UserSecretsId>ebaf7d76-34b1-423c-a22f-ceecd2078604</UserSecretsId>
-        <RootNamespace>DomainGateway.AppHost</RootNamespace>
-    </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UserSecretsId>ebaf7d76-34b1-423c-a22f-ceecd2078604</UserSecretsId>
+		<RootNamespace>DomainGateway.AppHost</RootNamespace>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0" />
-        <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.0" />
-        <PackageReference Include="Aspire.Hosting.Redis" Version="13.0.0" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0"/>
+		<PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.0.0"/>
+		<PackageReference Include="Aspire.Hosting.Redis" Version="13.0.0"/>
+	</ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\DomainGateway\DomainGateway.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\DomainGateway\DomainGateway.csproj"/>
+      <ProjectReference Include="..\DomainServiceA\DomainServiceA.csproj" />
+      <ProjectReference Include="..\DomainServiceB\DomainServiceB.csproj" />
+	</ItemGroup>
 
 </Project>

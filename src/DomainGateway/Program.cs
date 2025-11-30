@@ -97,15 +97,19 @@ var app = builder.Build();
 
 // migrate database on startup
 app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ => dbContext.Database.Migrate());
-// initialize configurations repository on startup
-await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshProxyConfigurationAsync();
-await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshRateLimiterConfigurationAsync();
-await app.Services.GetService<IGatewayConfigurationProvider>()!.RefreshServiceDiscoveryConfigurationAsync();
 
 app.UseExceptionHandler();
 app.MapDefaultEndpoints();
 app.UseRateLimiter();
 app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
+app.MapControllers();
+app.MapGet("/test/info", () => Results.Ok(new
+{
+	Service = "DomainGateway",
+	Version = "0.0.1",
+	Description = "...."
+}));
+app.MapStaticAssets();
 
 if (configuration.ExposeConfigurationsEndpoint)
 {
@@ -131,19 +135,8 @@ else
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 app.UseAntiforgery();
-
-app.MapStaticAssets();
 app.MapRazorComponents<App>()
 	.AddInteractiveWebAssemblyRenderMode()
 	.AddAdditionalAssemblies(typeof(DomainGateway.Client._Imports).Assembly);
-
-app.MapGet("/test/info", () => Results.Ok(new
-{
-	Service = "DomainGateway",
-	Version = "0.0.1",
-	Description = "...."
-}));
-
-app.MapControllers();
 
 await app.RunAsync();

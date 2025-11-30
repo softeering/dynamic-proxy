@@ -1,4 +1,3 @@
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Configuration;
 
@@ -6,12 +5,19 @@ namespace DomainGateway.Configurations;
 
 public class ProxyConfig : IProxyConfig
 {
-	public static readonly ProxyConfig Default = new();
-	private readonly CancellationTokenSource _cts = new();
+	private readonly CancellationTokenSource _cts;
+
+	public ProxyConfig()
+	{
+		this.Routes = [];
+		this.Clusters = [];
+		this._cts = new CancellationTokenSource();
+		this.ChangeToken = new CancellationChangeToken(this._cts.Token);
+	}
 
 	public IReadOnlyList<RouteConfig> Routes { get; set; }
 	public IReadOnlyList<ClusterConfig> Clusters { get; set; }
-	public IChangeToken ChangeToken { get; set; } = NullChangeToken.Singleton;
+	public IChangeToken ChangeToken { get; }
 
 	public void SignalChange()
 	{

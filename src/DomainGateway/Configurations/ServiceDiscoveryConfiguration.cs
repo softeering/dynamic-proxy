@@ -5,8 +5,8 @@ namespace DomainGateway.Configurations;
 public class ServiceDiscoveryConfiguration
 {
 	public static readonly ServiceDiscoveryConfiguration Default = new();
-	public List<string> AllowedClients { get; set; }
-	public List<RegisteredService> RegisteredServices { get; set; }
+	public List<string> AllowedClients { get; set; } = new();
+	public List<RegisteredService> RegisteredServices { get; set; } = new();
 
 	public bool HasServiceRegistered => this.RegisteredServices.Any();
 }
