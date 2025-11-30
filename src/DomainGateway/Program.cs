@@ -78,7 +78,7 @@ else
 	throw new Exception("No Gateway configuration provider provided");
 }
 
-builder.Services.AddReverseProxy();
+builder.Services.AddReverseProxy(); //.LoadFromMemory([], []);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
@@ -115,7 +115,7 @@ if (configuration.ExposeConfigurationsEndpoint)
 {
 	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/') + "/";
 	app.MapGet($"/{prefix}setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
-	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
+	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetConfig()));
 	app.MapGet($"/{prefix}ratelimiter", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
 	app.MapGet($"/{prefix}servicediscovery", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
 }

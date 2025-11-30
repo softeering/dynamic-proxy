@@ -26,7 +26,7 @@
 		{
 			"ClusterId": "infoCluster",
 			"Destinations": {
-				"exampleDestination": {
+				"localInfo": {
 					"Address": "https://localhost:5001/test/info"
 				}
 			}
@@ -34,7 +34,7 @@
 		{
 			"ClusterId": "weatherForecastCluster",
 			"Destinations": {
-				"exampleDestination": {
+				"weatherForecastService": {
 					"Address": "https://localhost:7002"
 				}
 			}
@@ -42,7 +42,7 @@
 		{
 			"ClusterId": "exchangeRateCluster",
 			"Destinations": {
-				"exampleDestination": {
+				"exchangeRateService": {
 					"Address": "https://localhost:8002"
 				}
 			}

@@ -10,6 +10,7 @@ public class FileSystemGatewayConfigurationSyncJob(
 {
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
+		// await Task.Delay(10_000, stoppingToken).ConfigureAwait(false); // Initial delay to allow other services to start
 		using var timer = new PeriodicTimer(setup.ConfigurationsRefreshInterval);
 
 		do

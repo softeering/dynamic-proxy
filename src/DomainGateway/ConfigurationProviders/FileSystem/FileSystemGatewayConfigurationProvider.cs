@@ -7,24 +7,35 @@ namespace DomainGateway.ConfigurationProviders.FileSystem;
 
 public class FileSystemGatewayConfigurationProvider(
 	ILogger<FileSystemGatewayConfigurationProvider> logger,
+	IConfigValidator configValidator,
 	FileSystemRepositorySetup setup) : IGatewayConfigurationProvider, IProxyConfigProvider
 {
 	private volatile ProxyConfig _proxyConfig = new();
 	private volatile RateLimiterConfiguration _rateLimiterConfig = RateLimiterConfiguration.Default;
 	private volatile ServiceDiscoveryConfiguration _serviceDiscoveryConfig = ServiceDiscoveryConfiguration.Default;
 
-	public ProxyConfig GetProxyConfiguration()
+	public IProxyConfig GetConfig()
 	{
 		return this._proxyConfig;
 	}
 
-	public Task RefreshProxyConfigurationAsync(CancellationToken cancellationToken = default)
+	public async Task RefreshProxyConfigurationAsync(CancellationToken cancellationToken = default)
 	{
 		logger.LogInformation("Refreshing proxy configuration...");
-		var newConfig = JsonSerializer.Deserialize<ProxyConfig>(File.ReadAllText(setup.ProxyConfigurationFilePath))!;
-		var oldConfig = Interlocked.Exchange(ref this._proxyConfig, newConfig);
-		oldConfig.SignalChange();
-		return Task.CompletedTask;
+		var newConfig = LoadFile<ProxyConfig>(setup.ProxyConfigurationFilePath);
+
+		foreach (var route in newConfig.Routes)
+		{
+			var errors = await configValidator.ValidateRouteAsync(route);
+		}
+
+		foreach (var cluster in newConfig.Clusters)
+		{
+			var errors = await configValidator.ValidateClusterAsync(cluster);
+		}
+
+		Interlocked.Exchange(ref this._proxyConfig, newConfig).SignalChange();
+		// return Task.CompletedTask;
 	}
 
 	public RateLimiterConfiguration GetRateLimiterConfiguration()
@@ -35,7 +46,7 @@ public class FileSystemGatewayConfigurationProvider(
 	public Task RefreshRateLimiterConfigurationAsync(CancellationToken cancellationToken = default)
 	{
 		logger.LogInformation("Refreshing rate limiter configuration...");
-		var newConfig = JsonSerializer.Deserialize<RateLimiterConfiguration>(File.ReadAllText(setup.RateLimiterConfigurationFilePath))!;
+		var newConfig = LoadFile<RateLimiterConfiguration>(setup.RateLimiterConfigurationFilePath);
 		Interlocked.Exchange(ref this._rateLimiterConfig, newConfig);
 		return Task.CompletedTask;
 	}
@@ -48,13 +59,14 @@ public class FileSystemGatewayConfigurationProvider(
 	public Task RefreshServiceDiscoveryConfigurationAsync(CancellationToken cancellationToken = default)
 	{
 		logger.LogInformation("Refreshing service discovery configuration...");
-		var newConfig = JsonSerializer.Deserialize<ServiceDiscoveryConfiguration>(File.ReadAllText(setup.ServiceDiscoveryConfigurationFilePath))!;
+		var newConfig = LoadFile<ServiceDiscoveryConfiguration>(setup.ServiceDiscoveryConfigurationFilePath);
 		Interlocked.Exchange(ref this._serviceDiscoveryConfig, newConfig);
 		return Task.CompletedTask;
 	}
 
-	public IProxyConfig GetConfig()
+	private static T LoadFile<T>(string filePath)
 	{
-		return this.GetProxyConfiguration();
+		using var fileContent = File.OpenRead(filePath);
+		return JsonSerializer.Deserialize<T>(fileContent)!;
 	}
 }

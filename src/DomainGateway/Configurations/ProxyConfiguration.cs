@@ -5,22 +5,10 @@ namespace DomainGateway.Configurations;
 
 public class ProxyConfig : IProxyConfig
 {
-	private readonly CancellationTokenSource _cts;
-
-	public ProxyConfig()
-	{
-		this.Routes = [];
-		this.Clusters = [];
-		this._cts = new CancellationTokenSource();
-		this.ChangeToken = new CancellationChangeToken(this._cts.Token);
-	}
-
+	private readonly CancellationTokenSource _cts = new();
 	public IReadOnlyList<RouteConfig> Routes { get; set; }
 	public IReadOnlyList<ClusterConfig> Clusters { get; set; }
-	public IChangeToken ChangeToken { get; }
+	public IChangeToken ChangeToken => new CancellationChangeToken(_cts.Token);
 
-	public void SignalChange()
-	{
-		this._cts.Cancel();
-	}
+	public void SignalChange() => this._cts.Cancel();
 }
