@@ -147,20 +147,3 @@ app.MapGet("/test/info", () => Results.Ok(new
 app.MapControllers();
 
 await app.RunAsync();
-
-
-/*
-
-using DomainGateway.Client.Pages;
-   using DomainGateway.Components;
-
-   var builder = WebApplication.CreateBuilder(args);
-
-   // Add services to the container.
-   builder.Services.AddRazorComponents()
-    .AddInteractiveWebAssemblyComponents();
-
-   var app = builder.Build();
-
-
-*/

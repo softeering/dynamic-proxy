@@ -2,6 +2,8 @@ using DomainGateway.Configurations;
 using System.Text.Json;
 using DomainGateway.Contracts;
 using DomainGateway.Infrastructure;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Configuration;
 
 namespace DomainGateway.ConfigurationProviders.FileSystem;
@@ -10,40 +12,44 @@ public class FileSystemGatewayConfigurationProvider(
 	ILogger<FileSystemGatewayConfigurationProvider> logger,
 	FileSystemRepositorySetup setup) : IGatewayConfigurationProvider, IProxyConfigProvider
 {
-	private readonly AtomicReference<ProxyConfig> _proxyConfig = new(ProxyConfig.Default);
-	private readonly AtomicReference<RateLimiterConfiguration> _rateLimiterConfig = new(RateLimiterConfiguration.Default);
-	private readonly AtomicReference<ServiceDiscoveryConfiguration> _serviceDiscoveryConfig = new(ServiceDiscoveryConfiguration.Default);
-	
+	private volatile ProxyConfig _proxyConfig = ProxyConfig.Default;
+	private volatile RateLimiterConfiguration _rateLimiterConfig = RateLimiterConfiguration.Default;
+	private volatile ServiceDiscoveryConfiguration _serviceDiscoveryConfig = ServiceDiscoveryConfiguration.Default;
+
 	public ProxyConfig GetProxyConfiguration()
 	{
-		return this._proxyConfig.Value;
+		return this._proxyConfig;
 	}
 
 	public Task RefreshProxyConfigurationAsync(CancellationToken cancellationToken = default)
 	{
-		this._proxyConfig.Value = JsonSerializer.Deserialize<ProxyConfig>(File.ReadAllText(setup.ProxyConfigurationFilePath))!;
+		var newConfig = JsonSerializer.Deserialize<ProxyConfig>(File.ReadAllText(setup.ProxyConfigurationFilePath))!;
+		var oldConfig = Interlocked.Exchange(ref this._proxyConfig, newConfig);
+		oldConfig.SignalChange();
 		return Task.CompletedTask;
 	}
 
 	public RateLimiterConfiguration GetRateLimiterConfiguration()
 	{
-		return this._rateLimiterConfig.Value;
+		return this._rateLimiterConfig;
 	}
 
 	public Task RefreshRateLimiterConfigurationAsync(CancellationToken cancellationToken = default)
 	{
-		this._rateLimiterConfig.Value = JsonSerializer.Deserialize<RateLimiterConfiguration>(File.ReadAllText(setup.RateLimiterConfigurationFilePath))!;
+		var newConfig = JsonSerializer.Deserialize<RateLimiterConfiguration>(File.ReadAllText(setup.RateLimiterConfigurationFilePath))!;
+		Interlocked.Exchange(ref this._rateLimiterConfig, newConfig);
 		return Task.CompletedTask;
 	}
 
 	public ServiceDiscoveryConfiguration GetServiceDiscoveryConfiguration()
 	{
-		return this._serviceDiscoveryConfig.Value;
+		return this._serviceDiscoveryConfig;
 	}
 
 	public Task RefreshServiceDiscoveryConfigurationAsync(CancellationToken cancellationToken = default)
 	{
-		this._serviceDiscoveryConfig.Value = JsonSerializer.Deserialize<ServiceDiscoveryConfiguration>(File.ReadAllText(setup.ServiceDiscoveryConfigurationFilePath))!;
+		var newConfig = JsonSerializer.Deserialize<ServiceDiscoveryConfiguration>(File.ReadAllText(setup.ServiceDiscoveryConfigurationFilePath))!;
+		Interlocked.Exchange(ref this._serviceDiscoveryConfig, newConfig);
 		return Task.CompletedTask;
 	}
 

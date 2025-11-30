@@ -6,5 +6,4 @@ public interface IServiceDiscoveryInstancesRepository
 	Task RegisterInstanceAsync(ServiceInstance instance, CancellationToken cancellationToken = default);
 	Task DeregisterInstanceAsync(string serviceName, string instanceId, CancellationToken cancellationToken = default);
 	Task PingAsync(ServiceInstance instance, CancellationToken cancellationToken = default);
-	Task<int> GetInstanceCountAsync(string serviceName, CancellationToken cancellationToken = default);
 }

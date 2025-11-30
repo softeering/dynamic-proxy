@@ -35,22 +35,27 @@ public class InstancesDatabaseRepository(ILogger<InstancesDatabaseRepository> lo
 
 		if (saved is null)
 		{
-			logger.LogWarning("event=unknownInstance, Heartbeat received for unknown instance {ServiceName}/{InstanceId}",
-				instance.ServiceName, instance.InstanceId);
+			logger.LogWarning(
+				"event=unknownInstance, Heartbeat received for unknown instance {ServiceName}/{InstanceId}. Instance will be registered as a new one.",
+				instance.ServiceName, instance.InstanceId
+			);
+			await this.RegisterInstanceAsync(instance, cancellationToken).ConfigureAwait(false);
 			return;
 		}
 
 		saved.ServiceVersion = instance.ServiceVersion;
+		if (saved.Host != instance.Host || saved.Port != instance.Port)
+		{
+			logger.LogInformation(
+				"event=instanceAddressChanged, Instance address changed for {ServiceName}/{InstanceId} from {OldHost}:{OldPort} to {NewHost}:{NewPort}",
+				instance.ServiceName, instance.InstanceId, saved.Host, saved.Port, instance.Host, instance.Port
+			);
+		}
+
 		saved.Host = instance.Host;
 		saved.Port = instance.Port;
 		saved.LastSeenTime = DateTimeOffset.UtcNow;
 		saved.MetadataValue = instance.Metadata is null ? null : JsonSerializer.Serialize(instance.Metadata);
 		await database.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-	}
-
-	public Task<int> GetInstanceCountAsync(string serviceName, CancellationToken cancellationToken = default)
-	{
-		return database.Instances
-			.CountAsync(i => i.ServiceName.Equals(serviceName), cancellationToken);
 	}
 }

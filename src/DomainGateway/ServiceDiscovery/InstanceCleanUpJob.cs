@@ -6,19 +6,25 @@ namespace DomainGateway.ServiceDiscovery;
 
 public class InstanceCleanUpJob(
 	ILogger<InstanceCleanUpJob> logger,
+	DomainGatewaySetup gatewaySetup,
 	IGatewayConfigurationProvider configurationProvider,
 	IServiceProvider serviceProvider) : BackgroundService
 {
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		var configuration = configurationProvider.GetServiceDiscoveryConfiguration();
-
-		using var timer = new PeriodicTimer(configuration.AutomaticCleanupInterval);
+		using var timer = new PeriodicTimer(gatewaySetup.AutomaticServiceInstanceCleanupInterval);
 
 		while (await timer.WaitForNextTickAsync(stoppingToken) && !stoppingToken.IsCancellationRequested)
 		{
+			var configuration = configurationProvider.GetServiceDiscoveryConfiguration();
+			if (!configuration.HasServiceRegistered)
+			{
+				logger.LogInformation("event=auto-deregistration, No services are registered for service discovery, skipping cleanup run");
+				continue;
+			}
+
 			using var scope = serviceProvider.GetScopedService(out IServiceDiscoveryInstancesRepository instancesRepository);
-			
+
 			foreach (var service in configuration.RegisteredServices)
 			{
 				if (service.AutoDeregistration == AutoDeregistration.Disabled)
@@ -27,7 +33,7 @@ public class InstanceCleanUpJob(
 						service.Name);
 					continue;
 				}
-				
+
 				var serviceName = service.Name;
 				var cleanupThreshold = service.InstanceStaleAt;
 				var instances = await instancesRepository.GetRegisteredInstancesAsync(serviceName, stoppingToken);

@@ -1,0 +1,6 @@
+@DomainServiceA_HostAddress = http://localhost:5193
+
+GET {{DomainServiceA_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
