@@ -19,22 +19,13 @@ public class FileSystemGatewayConfigurationProvider(
 		return this._proxyConfig;
 	}
 
-	public async Task RefreshProxyConfigurationAsync(CancellationToken cancellationToken = default)
+	public Task RefreshProxyConfigurationAsync(CancellationToken cancellationToken = default)
 	{
 		logger.LogInformation("Refreshing proxy configuration...");
 		var newConfig = LoadFile<ProxyConfig>(setup.ProxyConfigurationFilePath);
 
-		foreach (var route in newConfig.Routes)
-		{
-			var errors = await configValidator.ValidateRouteAsync(route);
-		}
-
-		foreach (var cluster in newConfig.Clusters)
-		{
-			var errors = await configValidator.ValidateClusterAsync(cluster);
-		}
-
 		Interlocked.Exchange(ref this._proxyConfig, newConfig).SignalChange();
+		return Task.CompletedTask;
 	}
 
 	public RateLimiterConfiguration GetRateLimiterConfiguration()
