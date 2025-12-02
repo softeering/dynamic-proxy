@@ -35,7 +35,6 @@ public class FileSystemGatewayConfigurationProvider(
 		}
 
 		Interlocked.Exchange(ref this._proxyConfig, newConfig).SignalChange();
-		// return Task.CompletedTask;
 	}
 
 	public RateLimiterConfiguration GetRateLimiterConfiguration()

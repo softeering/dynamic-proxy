@@ -20,8 +20,11 @@ public static class Extensions
 			};
 			return new AmazonS3Client(clientConfig);
 		});
-		services.AddSingleton<IGatewayConfigurationProvider, AwsS3ConfigurationProvider>();
-		services.AddSingleton<IProxyConfigProvider, AwsS3ConfigurationProvider>();
+		
+		services.AddSingleton<AwsS3ConfigurationProvider>();
+		services.AddSingleton<IGatewayConfigurationProvider>(sp => sp.GetRequiredService<AwsS3ConfigurationProvider>());
+		services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<AwsS3ConfigurationProvider>());
+		
 		services.AddHostedService<AwsS3ProxyConfigurationSyncJob>();
 		return services;
 	}

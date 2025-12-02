@@ -9,8 +9,11 @@ public static class Extensions
     public static IServiceCollection AddFileSystemProvider(this IServiceCollection services, FileSystemRepositorySetup configuration)
     {
         services.AddSingleton(configuration);
-        services.AddSingleton<IGatewayConfigurationProvider, FileSystemGatewayConfigurationProvider>();
-        services.AddSingleton<IProxyConfigProvider, FileSystemGatewayConfigurationProvider>();
+        
+		services.AddSingleton<FileSystemGatewayConfigurationProvider>();
+        services.AddSingleton<IGatewayConfigurationProvider>(sp => sp.GetRequiredService<FileSystemGatewayConfigurationProvider>());
+        services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<FileSystemGatewayConfigurationProvider>());
+        
         services.AddHostedService<FileSystemGatewayConfigurationSyncJob>();
         return services;
     }

@@ -98,6 +98,7 @@ var app = builder.Build();
 // migrate database on startup
 app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ => dbContext.Database.Migrate());
 
+// await app.Services.GetRequiredService<IGatewayConfigurationProvider>().RefreshProxyConfigurationAsync();
 app.UseExceptionHandler();
 app.MapDefaultEndpoints();
 app.UseRateLimiter();
