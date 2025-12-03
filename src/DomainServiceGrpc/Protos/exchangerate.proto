@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "DomainServiceGrpc";
+
+package softeering;
+
+// The greeting service definition.
+service ExchangeRate {
+  // Sends a greeting
+  rpc GetExchangeRate (ExchangeRateRequest) returns (ExchangeRateResponse);
+}
+
+// The request message containing the user's name.
+message ExchangeRateRequest {
+  optional string fromCurrency = 1;
+}
+
+// The response message containing the greetings.
+message ExchangeRateResponse {
+  map<string, string> rates = 1;
+}

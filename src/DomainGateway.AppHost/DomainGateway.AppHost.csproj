@@ -19,8 +19,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DomainGateway\DomainGateway.csproj"/>
-      <ProjectReference Include="..\DomainServiceA\DomainServiceA.csproj" />
-      <ProjectReference Include="..\DomainServiceB\DomainServiceB.csproj" />
+		<ProjectReference Include="..\DomainServiceGrpc\DomainServiceGrpc.csproj" />
+		<ProjectReference Include="..\DomainServiceHttp\DomainServiceHttp.csproj" />
 	</ItemGroup>
 
 </Project>

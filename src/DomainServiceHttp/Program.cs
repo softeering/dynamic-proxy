@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 
+const string DEFAULT_FROM_CURRENCY = "USD";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,13 +18,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/", ([FromQuery] string? fromCurrency = null) =>
+app.MapGet("/", async ([FromQuery] string? fromCurrency = null) =>
 	{
-		var url = "https://open.er-api.com/v6/latest/" + (fromCurrency ?? "USD");
+		var url = "https://open.er-api.com/v6/latest/" + (fromCurrency ?? DEFAULT_FROM_CURRENCY);
 		using var client = new HttpClient();
-		var response = client.GetStringAsync(url).Result;
+		var response = await client.GetFromJsonAsync<ExchangeRateModel>(url);
 		return response;
 	})
-	.WithName("GetWeatherForecast");
+	.WithName("get-exchange-rates");
 
 await app.RunAsync();
+
+record ExchangeRateModel(Dictionary<string, string> Rates);
