@@ -8,17 +8,17 @@
 			}
 		},
 		{
-			"RouteId": "weatherForecastRoute",
-			"ClusterId": "weatherForecastCluster",
+			"RouteId": "exchangeRateHttpRoute",
+			"ClusterId": "exchangeRateHttpCluster",
 			"Match": {
-				"Path": "/api/weather"
+				"Path": "/api/exchangerate"
 			}
 		},
 		{
-			"RouteId": "exchangeRateRoute",
-			"ClusterId": "exchangeRateCluster",
+			"RouteId": "exchangeRateGrpcRoute",
+			"ClusterId": "exchangeRateGrpcCluster",
 			"Match": {
-				"Path": "/api/exchangerate"
+				"Path": "/exchangerateservice"
 			}
 		}
 	],
@@ -32,19 +32,22 @@
 			}
 		},
 		{
-			"ClusterId": "weatherForecastCluster",
+			"ClusterId": "exchangeRateHttpCluster",
 			"Destinations": {
-				"weatherForecastService": {
+				"exchangeRateService": {
 					"Address": "https://localhost:7002"
 				}
 			}
 		},
 		{
-			"ClusterId": "exchangeRateCluster",
+			"ClusterId": "exchangeRateGrpcCluster",
 			"Destinations": {
 				"exchangeRateService": {
 					"Address": "https://localhost:8002"
 				}
+			},
+			"HttpRequest": {
+				"Version": "2.0"
 			}
 		}
 	]

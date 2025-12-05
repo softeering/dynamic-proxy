@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Protobuf Include="Protos\exchangerate.proto" GrpcServices="Server" />
+        <Protobuf Include="Protos\exchangerate.proto" GrpcServices="Server" Options="nullable_enable" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.64.0"/>
+        <PackageReference Include="Grpc.AspNetCore" Version="2.71.0" />
     </ItemGroup>
 
     <ItemGroup>

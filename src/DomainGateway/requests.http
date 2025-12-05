@@ -1,11 +1,19 @@
-@baseUrl = https://localhost:5001/api
+@baseUrl = https://localhost:5001
 @testService = service-test
 
-### HTTP Default route mapping
-GET {{baseUrl}}
+### default route mapping - direct
+GET {{baseUrl}}/test/info
 Client-Id: test-client
 
-### gRPC Default route mapping
+### default route mapping - proxied
+GET {{baseUrl}}/info
+Client-Id: test-client
+
+### default route mapping - proxied
+GET {{baseUrl}}/api/exchangerate
+Client-Id: test-client
+
+### exchange rate http api - proxied
 GRPC localhost:8080
 Client-Id: test-client
 

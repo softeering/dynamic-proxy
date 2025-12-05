@@ -12,6 +12,7 @@ using DomainGateway.ServiceDiscovery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SoftEEring.Core.Helpers;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,7 +79,16 @@ else
 	throw new Exception("No Gateway configuration provider provided");
 }
 
-builder.Services.AddReverseProxy(); //.LoadFromMemory([], []);
+builder.Services.AddReverseProxy().AddTransforms(builderContext =>
+{
+	builderContext.AddRequestTransform(async transformContext =>
+	{
+		var request = transformContext.HttpContext.Request;
+		Console.WriteLine($"YARP Request: {request.Method} {request.Path}");
+		await Task.CompletedTask;
+	});
+}); //.LoadFromMemory([], []);
+
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
@@ -100,7 +110,6 @@ app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ => d
 
 // await app.Services.GetRequiredService<IGatewayConfigurationProvider>().RefreshProxyConfigurationAsync();
 app.UseExceptionHandler();
-app.MapDefaultEndpoints();
 app.UseRateLimiter();
 app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
 app.MapControllers();
@@ -110,6 +119,7 @@ app.MapGet("/test/info", () => Results.Ok(new
 	Version = "0.0.1",
 	Description = "...."
 }));
+app.MapDefaultEndpoints();
 app.MapStaticAssets();
 
 if (configuration.ExposeConfigurationsEndpoint)
