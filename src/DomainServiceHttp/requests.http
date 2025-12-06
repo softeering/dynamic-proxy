@@ -1,0 +1,7 @@
+@baseUrl = https://localhost:7002
+
+###################
+### exchangerate api
+###################
+GET {{baseUrl}}/exchangerate
+Accept: application/json

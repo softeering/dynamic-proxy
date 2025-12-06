@@ -16,7 +16,8 @@ using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults().Services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
+builder.AddServiceDefaults();
+
 builder.Host.UseDefaultServiceProvider(config => config.ValidateOnBuild = true);
 var configurationSection = builder.Configuration.GetSection("DomainGatewayConfiguration");
 builder.Services.Configure<DomainGatewaySetup>(configurationSection);
@@ -76,7 +77,7 @@ else if (configuration.AzBlobStorageRepository is not null)
 }
 else
 {
-	throw new Exception("No Gateway configuration provider provided");
+	throw new Exception("No Gateway configuration provider found in setup.");
 }
 
 builder.Services.AddReverseProxy().AddTransforms(builderContext =>
@@ -84,7 +85,7 @@ builder.Services.AddReverseProxy().AddTransforms(builderContext =>
 	builderContext.AddRequestTransform(async transformContext =>
 	{
 		var request = transformContext.HttpContext.Request;
-		Console.WriteLine($"YARP Request: {request.Method} {request.Path}");
+		Console.WriteLine($"YARP Request handling: {request.HttpContext} mapped to {transformContext.DestinationPrefix}");
 		await Task.CompletedTask;
 	});
 }); //.LoadFromMemory([], []);
@@ -103,6 +104,11 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddSingleton<IAuthorizationHandler, ClientIdHeaderRequirementHandler>();
 builder.Services.AddHostedService<InstanceCleanUpJob>();
 
+if (configuration.EnableAdminPortal)
+{
+	builder.Services.AddRazorComponents().AddInteractiveWebAssemblyComponents();
+}
+
 var app = builder.Build();
 
 // migrate database on startup
@@ -113,7 +119,7 @@ app.UseExceptionHandler();
 app.UseRateLimiter();
 app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
 app.MapControllers();
-app.MapGet("/test/info", () => Results.Ok(new
+app.MapGet("/info", () => Results.Ok(new
 {
 	Service = "DomainGateway",
 	Version = "0.0.1",
@@ -126,7 +132,7 @@ if (configuration.ExposeConfigurationsEndpoint)
 {
 	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/') + "/";
 	app.MapGet($"/{prefix}setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
-	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetConfig()));
+	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
 	app.MapGet($"/{prefix}ratelimiter", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
 	app.MapGet($"/{prefix}servicediscovery", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
 }
@@ -134,7 +140,8 @@ if (configuration.ExposeConfigurationsEndpoint)
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-	app.UseWebAssemblyDebugging();
+	if (configuration.EnableAdminPortal)
+		app.UseWebAssemblyDebugging();
 }
 else
 {
@@ -145,9 +152,13 @@ else
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
-app.UseAntiforgery();
-app.MapRazorComponents<App>()
-	.AddInteractiveWebAssemblyRenderMode()
-	.AddAdditionalAssemblies(typeof(DomainGateway.Client._Imports).Assembly);
+
+if (configuration.EnableAdminPortal)
+{
+	app.UseAntiforgery();
+	app.MapRazorComponents<App>()
+		.AddInteractiveWebAssemblyRenderMode()
+		.AddAdditionalAssemblies(typeof(DomainGateway.Client._Imports).Assembly);
+}
 
 await app.RunAsync();

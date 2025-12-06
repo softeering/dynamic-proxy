@@ -1,14 +1,21 @@
 using DomainGateway.Configurations;
-using Yarp.ReverseProxy.Configuration;
 
 namespace DomainGateway.Contracts;
 
 public interface IGatewayConfigurationProvider
 {
-    IProxyConfig GetConfig();
-    Task RefreshProxyConfigurationAsync(CancellationToken cancellationToken = default);
-    RateLimiterConfiguration GetRateLimiterConfiguration();
-    Task RefreshRateLimiterConfigurationAsync(CancellationToken cancellationToken = default);
-    ServiceDiscoveryConfiguration GetServiceDiscoveryConfiguration();
-    Task RefreshServiceDiscoveryConfigurationAsync(CancellationToken cancellationToken = default);
+	ProxyConfig GetProxyConfiguration();
+	Task<ProxyConfig> LoadProxyConfigurationAsync(CancellationToken cancellationToken = default);
+	Task RefreshProxyConfigurationAsync(ProxyConfig config, CancellationToken cancellationToken = default);
+	Task SaveProxyConfigurationAsync(ProxyConfig config, CancellationToken cancellationToken = default);
+
+	RateLimiterConfiguration GetRateLimiterConfiguration();
+	Task<RateLimiterConfiguration> LoadRateLimiterConfigurationAsync(CancellationToken cancellationToken = default);
+	Task RefreshRateLimiterConfigurationAsync(RateLimiterConfiguration config, CancellationToken cancellationToken = default);
+	Task SaveRateLimiterConfigurationAsync(RateLimiterConfiguration config, CancellationToken cancellationToken = default);
+
+	ServiceDiscoveryConfiguration GetServiceDiscoveryConfiguration();
+	Task<ServiceDiscoveryConfiguration> LoadServiceDiscoveryConfigurationAsync(CancellationToken cancellationToken = default);
+	Task RefreshServiceDiscoveryConfigurationAsync(ServiceDiscoveryConfiguration config, CancellationToken cancellationToken = default);
+	Task SaveServiceDiscoveryConfigurationAsync(ServiceDiscoveryConfiguration config, CancellationToken cancellationToken = default);
 }

@@ -1,10 +1,10 @@
 using DomainGateway.Configurations;
 using DomainGateway.Contracts;
 
-namespace DomainGateway.ConfigurationProviders.FileSystem;
+namespace DomainGateway.ConfigurationProviders;
 
-public class FileSystemGatewayConfigurationSyncJob(
-	ILogger<FileSystemGatewayConfigurationSyncJob> logger,
+public class GatewayConfigurationSyncJob(
+	ILogger<GatewayConfigurationSyncJob> logger,
 	FileSystemRepositorySetup setup,
 	IGatewayConfigurationProvider proxyConfigurationProvider) : BackgroundService
 {
@@ -27,7 +27,8 @@ public class FileSystemGatewayConfigurationSyncJob(
 		{
 			logger.LogInformation("event=ProxyConfigurationRefresh, starting refresh for proxy configuration from source {SourceKey}...",
 				setup.ProxyConfigurationFilePath);
-			await proxyConfigurationProvider.RefreshProxyConfigurationAsync(stoppingToken).ConfigureAwait(false);
+			var config = await proxyConfigurationProvider.LoadProxyConfigurationAsync(stoppingToken).ConfigureAwait(false);
+			await proxyConfigurationProvider.RefreshProxyConfigurationAsync(config).ConfigureAwait(false);
 			logger.LogInformation("event=ProxyConfigurationRefresh, refresh completed successfully for proxy configuration from source {SourceKey}...",
 				setup.ProxyConfigurationFilePath);
 		}
@@ -44,7 +45,8 @@ public class FileSystemGatewayConfigurationSyncJob(
 		{
 			logger.LogInformation("event=RateLimiterRefresh, starting refresh for rate limiter configuration from source {SourceKey}...",
 				setup.RateLimiterConfigurationFilePath);
-			await proxyConfigurationProvider.RefreshRateLimiterConfigurationAsync(stoppingToken).ConfigureAwait(false);
+			var config = await proxyConfigurationProvider.LoadRateLimiterConfigurationAsync(stoppingToken).ConfigureAwait(false);
+			await proxyConfigurationProvider.RefreshRateLimiterConfigurationAsync(config).ConfigureAwait(false);
 			logger.LogInformation("event=RateLimiterRefresh, refresh completed successfully for rate limiter configuration from source {SourceKey}...",
 				setup.RateLimiterConfigurationFilePath);
 		}
@@ -61,7 +63,8 @@ public class FileSystemGatewayConfigurationSyncJob(
 		{
 			logger.LogInformation("event=ServiceDiscoveryRefresh, starting refresh for service discovery configuration from source {SourceKey}...",
 				setup.ServiceDiscoveryConfigurationFilePath);
-			await proxyConfigurationProvider.RefreshServiceDiscoveryConfigurationAsync(stoppingToken).ConfigureAwait(false);
+			var config = await proxyConfigurationProvider.LoadServiceDiscoveryConfigurationAsync(stoppingToken).ConfigureAwait(false);
+			await proxyConfigurationProvider.RefreshServiceDiscoveryConfigurationAsync(config).ConfigureAwait(false);
 			logger.LogInformation("event=ServiceDiscoveryRefresh, refresh completed successfully for service discovery configuration from source {SourceKey}...",
 				setup.ServiceDiscoveryConfigurationFilePath);
 		}

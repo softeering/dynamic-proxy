@@ -14,7 +14,7 @@ public static class Extensions
         services.AddSingleton<IGatewayConfigurationProvider>(sp => sp.GetRequiredService<FileSystemGatewayConfigurationProvider>());
         services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<FileSystemGatewayConfigurationProvider>());
         
-        services.AddHostedService<FileSystemGatewayConfigurationSyncJob>();
+        services.AddHostedService<GatewayConfigurationSyncJob>();
         return services;
     }
 }

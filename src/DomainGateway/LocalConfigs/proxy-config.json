@@ -4,15 +4,31 @@
 			"RouteId": "infoRoute",
 			"ClusterId": "infoCluster",
 			"Match": {
-				"Path": "/info"
-			}
+				"Path": "/proxied/info",
+				"Methods": [
+					"GET"
+				]
+			},
+			"Transforms": [
+				{
+					"PathRemovePrefix": "/proxied"
+				}
+			]
 		},
 		{
 			"RouteId": "exchangeRateHttpRoute",
 			"ClusterId": "exchangeRateHttpCluster",
 			"Match": {
-				"Path": "/api/exchangerate"
-			}
+				"Path": "/api/exchangerate",
+				"Methods": [
+					"GET"
+				]
+			},
+			"Transforms": [
+				{
+					"PathRemovePrefix": "/api/exchangerate"
+				}
+			]
 		},
 		{
 			"RouteId": "exchangeRateGrpcRoute",
@@ -27,7 +43,7 @@
 			"ClusterId": "infoCluster",
 			"Destinations": {
 				"localInfo": {
-					"Address": "https://localhost:5001/test/info"
+					"Address": "https://localhost:5001"
 				}
 			}
 		},
@@ -35,7 +51,7 @@
 			"ClusterId": "exchangeRateHttpCluster",
 			"Destinations": {
 				"exchangeRateService": {
-					"Address": "https://localhost:7002"
+					"Address": "https://localhost:7002/exchangerate?fromCurrency=EUR"
 				}
 			}
 		},

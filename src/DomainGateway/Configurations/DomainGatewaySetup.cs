@@ -4,6 +4,7 @@ public class DomainGatewaySetup
 {
 	public required string ClientIdHeaderName { get; init; }
 	public bool ExposeConfigurationsEndpoint { get; init; }
+	public bool EnableAdminPortal { get; init; }
 	public string ConfigurationsEndpointPrefix { get; init; } = "/configurations";
 	public TimeSpan AutomaticServiceInstanceCleanupInterval { get; set; } = TimeSpan.FromMinutes(1);
 	public FileSystemRepositorySetup? FileSystemRepository { get; init; }

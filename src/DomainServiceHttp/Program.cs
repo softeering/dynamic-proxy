@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-const string DEFAULT_FROM_CURRENCY = "USD";
+const string defaultFromCurrency = "USD";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/", async ([FromQuery] string? fromCurrency = null) =>
+app.MapGet("/exchangerate", async ([FromQuery] string? fromCurrency = null) =>
 	{
-		var url = "https://open.er-api.com/v6/latest/" + (fromCurrency ?? DEFAULT_FROM_CURRENCY);
+		var url = "https://open.er-api.com/v6/latest/" + (fromCurrency ?? defaultFromCurrency);
 		using var client = new HttpClient();
 		var response = await client.GetFromJsonAsync<ExchangeRateModel>(url);
 		return response;
@@ -29,4 +29,4 @@ app.MapGet("/", async ([FromQuery] string? fromCurrency = null) =>
 
 await app.RunAsync();
 
-record ExchangeRateModel(Dictionary<string, string> Rates);
+record ExchangeRateModel(Dictionary<string, decimal> Rates);

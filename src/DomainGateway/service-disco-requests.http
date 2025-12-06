@@ -1,23 +1,9 @@
 @baseUrl = https://localhost:5001
 @testService = service-test
 
-### default route mapping - direct
-GET {{baseUrl}}/test/info
-Client-Id: test-client
-
-### default route mapping - proxied
-GET {{baseUrl}}/info
-Client-Id: test-client
-
-### default route mapping - proxied
-GET {{baseUrl}}/api/exchangerate
-Client-Id: test-client
-
-### exchange rate http api - proxied
-GRPC localhost:8080
-Client-Id: test-client
-
+###################
 ### Servcie discovery - register instance
+###################
 POST {{baseUrl}}/servicediscovery/{{testService}}/register
 Content-Type: application/json
 Client-Id: test-client
@@ -33,11 +19,16 @@ Client-Id: test-client
   }
 }
 
-### Service discovery - list instances
+###################
+### Servcie discovery - list instances
+###################
 GET {{baseUrl}}/servicediscovery/{{testService}}/instances
+Accept: application/json
 Client-Id: test-client
 
+###################
 ### Servcie discovery - heartbeat
+###################
 PUT {{baseUrl}}/servicediscovery/{{testService}}/ping
 Content-Type: application/json
 Client-Id: test-client
@@ -53,6 +44,8 @@ Client-Id: test-client
   }
 }
 
-### Servcie discovery - heartbeat
+###################
+### Servcie discovery - re-register
+###################
 DELETE {{baseUrl}}/servicediscovery/{{testService}}/instance-1
 Client-Id: test-client

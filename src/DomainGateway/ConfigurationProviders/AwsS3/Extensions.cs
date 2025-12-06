@@ -25,7 +25,7 @@ public static class Extensions
 		services.AddSingleton<IGatewayConfigurationProvider>(sp => sp.GetRequiredService<AwsS3ConfigurationProvider>());
 		services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<AwsS3ConfigurationProvider>());
 		
-		services.AddHostedService<AwsS3ProxyConfigurationSyncJob>();
+		services.AddHostedService<GatewayConfigurationSyncJob>();
 		return services;
 	}
 }

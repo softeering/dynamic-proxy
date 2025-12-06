@@ -1,0 +1,28 @@
+@baseUrl = https://localhost:5001
+
+###################
+### info route - direct
+###################
+GET {{baseUrl}}/info
+Accept: application/json
+Client-Id: test-client
+
+###################
+### info route - proxied
+###################
+GET {{baseUrl}}/proxied/info
+Accept: application/json
+Client-Id: test-client
+
+###################
+### http exchangerate route - proxied
+###################
+GET {{baseUrl}}/api/exchangerate
+Accept: application/json
+Client-Id: test-client
+
+###################
+### grpc route - proxied
+###################
+GET https://localhost:8002/api/exchangerate
+Client-Id: test-client
