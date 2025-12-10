@@ -11,7 +11,7 @@ public static class Extensions
 	public static IServiceCollection AddAwsS3Provider(this IServiceCollection services, AwsS3RepositorySetup configuration)
 	{
 		services.AddSingleton(configuration);
-		services.AddSingleton<IAmazonS3>(sp =>
+		services.AddTransient<IAmazonS3>(sp =>
 		{
 			var clientConfig = new AmazonS3Config
 			{
@@ -21,11 +21,8 @@ public static class Extensions
 			return new AmazonS3Client(clientConfig);
 		});
 		
-		services.AddSingleton<AwsS3ConfigurationProvider>();
-		services.AddSingleton<IGatewayConfigurationProvider>(sp => sp.GetRequiredService<AwsS3ConfigurationProvider>());
-		services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<AwsS3ConfigurationProvider>());
+		services.AddTransient<IGatewayConfigurationProvider, AwsS3ConfigurationProvider>();
 		
-		services.AddHostedService<GatewayConfigurationSyncJob>();
 		return services;
 	}
 }

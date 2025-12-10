@@ -4,10 +4,10 @@ option csharp_namespace = "DomainServiceGrpc";
 
 package softeering;
 
-// The greeting service definition.
+// The ExchangeRate service definition.
 service ExchangeRate {
   // Sends a greeting
-  rpc GetExchangeRate (ExchangeRateRequest) returns (ExchangeRateResponse);
+  rpc GetRate (ExchangeRateRequest) returns (ExchangeRateResponse);
 }
 
 // The request message containing the user's name.
@@ -17,5 +17,5 @@ message ExchangeRateRequest {
 
 // The response message containing the greetings.
 message ExchangeRateResponse {
-  map<string, string> rates = 1;
+  map<string, double> rates = 1;
 }

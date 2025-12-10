@@ -6,7 +6,7 @@ public class ExchangeRateService(ILogger<ExchangeRateService> logger) : Exchange
 {
 	private const string DefaultFromCurrency = "USD";
 
-	public override async Task<ExchangeRateResponse> GetExchangeRate(ExchangeRateRequest request, ServerCallContext context)
+	public override async Task<ExchangeRateResponse> GetRate(ExchangeRateRequest request, ServerCallContext context)
 	{
 		logger.LogInformation("The currency received {Currency}", request.FromCurrency);
 		string fromCurrency = request.HasFromCurrency ? request.FromCurrency : DefaultFromCurrency;
@@ -28,4 +28,4 @@ public class ExchangeRateService(ILogger<ExchangeRateService> logger) : Exchange
 	}
 }
 
-record ExchangeRateModel(Dictionary<string, string> Rates);
+record ExchangeRateModel(Dictionary<string, double> Rates);

@@ -1,0 +1,18 @@
+@baseUrl = https://localhost:8002
+
+###################
+### http default call
+###################
+GET {{baseUrl}}
+Accept: application/json
+
+###################
+### grpc route - proxied
+### exchangerateservice.Exchangerate/GetRate
+### grpcurl -plaintext -d '{"fromCurrency":"USD"}' localhost:8001 softeering.ExchangeRate/GetRate
+###################
+GRPC localhost:8001/softeering.ExchangeRate/GetRate
+
+{
+    "fromCurrency": "EUR"
+}

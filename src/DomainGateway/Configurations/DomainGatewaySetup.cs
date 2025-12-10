@@ -6,6 +6,7 @@ public class DomainGatewaySetup
 	public bool ExposeConfigurationsEndpoint { get; init; }
 	public bool EnableAdminPortal { get; init; }
 	public string ConfigurationsEndpointPrefix { get; init; } = "/configurations";
+	public int? UnsecuredHttp2Port { get; init; }
 	public TimeSpan AutomaticServiceInstanceCleanupInterval { get; set; } = TimeSpan.FromMinutes(1);
 	public FileSystemRepositorySetup? FileSystemRepository { get; init; }
 	public AwsS3RepositorySetup? AwsS3Repository { get; init; }

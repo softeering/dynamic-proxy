@@ -34,7 +34,7 @@
 			"RouteId": "exchangeRateGrpcRoute",
 			"ClusterId": "exchangeRateGrpcCluster",
 			"Match": {
-				"Path": "/exchangerateservice"
+				"Path": "/softeering.ExchangeRate/{**catch-all}"
 			}
 		}
 	],
@@ -51,14 +51,18 @@
 			"ClusterId": "exchangeRateHttpCluster",
 			"Destinations": {
 				"exchangeRateService": {
-					"Address": "https://localhost:7002/exchangerate?fromCurrency=EUR"
+					"Address": "https://localhost:7002/exchangerate"
 				}
 			}
 		},
 		{
 			"ClusterId": "exchangeRateGrpcCluster",
+			"LoadBalancingPolicy": "RoundRobin",
+			"Metadata": {
+				"ServiceDiscoveryTarget": "domain-service-grpc"
+			},
 			"Destinations": {
-				"exchangeRateService": {
+				"destination1": {
 					"Address": "https://localhost:8002"
 				}
 			},

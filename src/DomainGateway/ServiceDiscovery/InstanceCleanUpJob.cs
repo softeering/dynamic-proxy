@@ -8,7 +8,7 @@ namespace DomainGateway.ServiceDiscovery;
 public class InstanceCleanUpJob(
 	ILogger<InstanceCleanUpJob> logger,
 	IOptions<DomainGatewaySetup> gatewaySetup,
-	IGatewayConfigurationProvider configurationProvider,
+	IGatewayConfigurationService gatewayConfigurationService,
 	IServiceProvider serviceProvider) : BackgroundService
 {
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -20,7 +20,7 @@ public class InstanceCleanUpJob(
 		{
 			try
 			{
-				var configuration = configurationProvider.GetServiceDiscoveryConfiguration();
+				var configuration = gatewayConfigurationService.GetServiceDiscoveryConfiguration();
 				if (!configuration.HasServiceRegistered)
 				{
 					logger.LogInformation("event=auto-deregistration, No services are registered for service discovery, skipping cleanup run");

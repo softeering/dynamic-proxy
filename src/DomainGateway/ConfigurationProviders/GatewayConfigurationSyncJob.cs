@@ -6,7 +6,7 @@ namespace DomainGateway.ConfigurationProviders;
 public class GatewayConfigurationSyncJob(
 	ILogger<GatewayConfigurationSyncJob> logger,
 	FileSystemRepositorySetup setup,
-	IGatewayConfigurationProvider proxyConfigurationProvider) : BackgroundService
+	IServiceProvider serviceProvider) : BackgroundService
 {
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
@@ -15,20 +15,21 @@ public class GatewayConfigurationSyncJob(
 
 		do
 		{
-			await this.RefreshProxyConfiguration(stoppingToken).ConfigureAwait(false);
-			await this.RefreshRateLimiter(stoppingToken).ConfigureAwait(false);
-			await this.RefreshServiceDiscovery(stoppingToken).ConfigureAwait(false);
+			var gatewayConfigurationService = serviceProvider.GetRequiredService<IGatewayConfigurationService>();
+			
+			await this.RefreshProxyConfiguration(gatewayConfigurationService, stoppingToken).ConfigureAwait(false);
+			await this.RefreshRateLimiterConfiguration(gatewayConfigurationService, stoppingToken).ConfigureAwait(false);
+			await this.RefreshServiceDiscoveryConfiguration(gatewayConfigurationService, stoppingToken).ConfigureAwait(false);
 		} while (await timer.WaitForNextTickAsync(stoppingToken) && !stoppingToken.IsCancellationRequested);
 	}
 
-	private async Task RefreshProxyConfiguration(CancellationToken stoppingToken)
+	private async Task RefreshProxyConfiguration(IGatewayConfigurationService gatewayConfigurationService, CancellationToken stoppingToken)
 	{
 		try
 		{
 			logger.LogInformation("event=ProxyConfigurationRefresh, starting refresh for proxy configuration from source {SourceKey}...",
 				setup.ProxyConfigurationFilePath);
-			var config = await proxyConfigurationProvider.LoadProxyConfigurationAsync(stoppingToken).ConfigureAwait(false);
-			await proxyConfigurationProvider.RefreshProxyConfigurationAsync(config).ConfigureAwait(false);
+			await gatewayConfigurationService.RefreshProxyConfigurationAsync(stoppingToken).ConfigureAwait(false);
 			logger.LogInformation("event=ProxyConfigurationRefresh, refresh completed successfully for proxy configuration from source {SourceKey}...",
 				setup.ProxyConfigurationFilePath);
 		}
@@ -39,14 +40,13 @@ public class GatewayConfigurationSyncJob(
 		}
 	}
 
-	private async Task RefreshRateLimiter(CancellationToken stoppingToken)
+	private async Task RefreshRateLimiterConfiguration(IGatewayConfigurationService gatewayConfigurationService, CancellationToken stoppingToken)
 	{
 		try
 		{
 			logger.LogInformation("event=RateLimiterRefresh, starting refresh for rate limiter configuration from source {SourceKey}...",
 				setup.RateLimiterConfigurationFilePath);
-			var config = await proxyConfigurationProvider.LoadRateLimiterConfigurationAsync(stoppingToken).ConfigureAwait(false);
-			await proxyConfigurationProvider.RefreshRateLimiterConfigurationAsync(config).ConfigureAwait(false);
+			await gatewayConfigurationService.RefreshRateLimiterConfigurationAsync(stoppingToken).ConfigureAwait(false);
 			logger.LogInformation("event=RateLimiterRefresh, refresh completed successfully for rate limiter configuration from source {SourceKey}...",
 				setup.RateLimiterConfigurationFilePath);
 		}
@@ -57,14 +57,13 @@ public class GatewayConfigurationSyncJob(
 		}
 	}
 
-	private async Task RefreshServiceDiscovery(CancellationToken stoppingToken)
+	private async Task RefreshServiceDiscoveryConfiguration(IGatewayConfigurationService gatewayConfigurationService, CancellationToken stoppingToken)
 	{
 		try
 		{
 			logger.LogInformation("event=ServiceDiscoveryRefresh, starting refresh for service discovery configuration from source {SourceKey}...",
 				setup.ServiceDiscoveryConfigurationFilePath);
-			var config = await proxyConfigurationProvider.LoadServiceDiscoveryConfigurationAsync(stoppingToken).ConfigureAwait(false);
-			await proxyConfigurationProvider.RefreshServiceDiscoveryConfigurationAsync(config).ConfigureAwait(false);
+			await gatewayConfigurationService.RefreshServiceDiscoveryConfigurationAsync(stoppingToken).ConfigureAwait(false);
 			logger.LogInformation("event=ServiceDiscoveryRefresh, refresh completed successfully for service discovery configuration from source {SourceKey}...",
 				setup.ServiceDiscoveryConfigurationFilePath);
 		}

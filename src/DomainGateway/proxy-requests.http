@@ -22,7 +22,20 @@ Accept: application/json
 Client-Id: test-client
 
 ###################
-### grpc route - proxied
+### http exchangerate route - proxied with request parameter
 ###################
-GET https://localhost:8002/api/exchangerate
+GET {{baseUrl}}/api/exchangerate?fromCurrency=USD
+Accept: application/json
 Client-Id: test-client
+
+###################
+### grpc route - proxied
+### exchangerateservice.Exchangerate/GetRate
+### grpcurl -plaintext -d '{"fromCurrency":"USD"}' localhost:6000 exchangerateservice.Exchangerate/GetRate
+###################
+GRPC localhost:5010/softeering.ExchangeRate/GetRate
+Client-Id: test-client
+
+{
+    "fromCurrency": "EUR"
+}

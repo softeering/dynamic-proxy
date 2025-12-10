@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
 using DomainGateway.Components;
+using DomainGateway.ConfigurationProviders;
 using DomainGateway.ConfigurationProviders.AwsS3;
 using DomainGateway.ConfigurationProviders.AzBlobStorage;
 using DomainGateway.ConfigurationProviders.FileSystem;
@@ -12,6 +13,7 @@ using DomainGateway.ServiceDiscovery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using SoftEEring.Core.Helpers;
+using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +34,7 @@ builder.Services.AddRateLimiter(options =>
 	{
 		// Extract clientId from header, fallback unknown if not present
 		var clientId = context.Request.Headers[configuration.ClientIdHeaderName].FirstOrDefault() ?? "unknown";
-		var configProvider = context.RequestServices.GetRequiredService<IGatewayConfigurationProvider>();
+		var configProvider = context.RequestServices.GetRequiredService<IGatewayConfigurationService>();
 		var config = configProvider.GetRateLimiterConfiguration().ConfigurationByClient.TryGetValue(clientId, out var configValue)
 			? configValue
 			: ThrottlingConfig.DefaultDisabledConfig;
@@ -102,7 +104,12 @@ builder.Services.AddAuthorization(options =>
 	);
 });
 builder.Services.AddSingleton<IAuthorizationHandler, ClientIdHeaderRequirementHandler>();
+builder.Services.AddSingleton<GatewayConfigurationService>();
+builder.Services.AddSingleton<IGatewayConfigurationService>(sp => sp.GetRequiredService<GatewayConfigurationService>());
+builder.Services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<GatewayConfigurationService>());
+
 builder.Services.AddHostedService<InstanceCleanUpJob>();
+builder.Services.AddHostedService<GatewayConfigurationSyncJob>();
 
 if (configuration.EnableAdminPortal)
 {
@@ -132,9 +139,9 @@ if (configuration.ExposeConfigurationsEndpoint)
 {
 	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/') + "/";
 	app.MapGet($"/{prefix}setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
-	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetProxyConfiguration()));
-	app.MapGet($"/{prefix}ratelimiter", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetRateLimiterConfiguration()));
-	app.MapGet($"/{prefix}servicediscovery", (IGatewayConfigurationProvider provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
+	app.MapGet($"/{prefix}proxy", (IGatewayConfigurationService provider) => Results.Json(provider.GetProxyConfiguration()));
+	app.MapGet($"/{prefix}ratelimiter", (IGatewayConfigurationService provider) => Results.Json(provider.GetRateLimiterConfiguration()));
+	app.MapGet($"/{prefix}servicediscovery", (IGatewayConfigurationService provider) => Results.Json(provider.GetServiceDiscoveryConfiguration()));
 }
 
 // Configure the HTTP request pipeline.
@@ -151,7 +158,6 @@ else
 }
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
 
 if (configuration.EnableAdminPortal)
 {
