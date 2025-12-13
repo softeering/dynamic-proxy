@@ -27,6 +27,8 @@ app.MapGet("/exchangerate", async ([FromQuery] string? fromCurrency = null) =>
 	})
 	.WithName("get-exchange-rates");
 
+app.MapGet("/heath", () => Results.Ok(new { Healthy = true })).WithName("health-indicator");
+
 await app.RunAsync();
 
 record ExchangeRateModel(Dictionary<string, decimal> Rates);

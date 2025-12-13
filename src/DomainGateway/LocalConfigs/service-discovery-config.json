@@ -4,10 +4,10 @@
 	],
 	"RegisteredServices": [
 		{
-			"Name": "example-service",
-			"Description": "An example service for demonstration purposes.",
-			"OwnerEmail": "...@...com",
-			"InstancesHeartbeatInterval": "00:00:30",
+			"Name": "exchange-rate-grpc",
+			"Description": "A service to retrieve exchange rate from a given currency",
+			"OwnerEmail": "someone@example.com",
+			"InstancesHeartbeatInterval": "00:00:15",
 			"MaxHeartbeatIntervalMiss": 3,
 			"AutoDeregistration": "DryRun"
 		}

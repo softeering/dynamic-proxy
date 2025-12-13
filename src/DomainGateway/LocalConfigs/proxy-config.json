@@ -49,9 +49,21 @@
 		},
 		{
 			"ClusterId": "exchangeRateHttpCluster",
+			"Metadata": {
+				"ConsecutiveFailuresHealthPolicy.Threshold": "3"
+			},
 			"Destinations": {
 				"exchangeRateService": {
 					"Address": "https://localhost:7002/exchangerate"
+				}
+			},
+			"HealthCheck": {
+				"Active": {
+					"Enabled": true,
+					"Interval": "00:00:10",
+					"Timeout": "00:00:10",
+					"Policy": "ConsecutiveFailures",
+					"Path": "/health"
 				}
 			}
 		},
@@ -59,15 +71,25 @@
 			"ClusterId": "exchangeRateGrpcCluster",
 			"LoadBalancingPolicy": "RoundRobin",
 			"Metadata": {
-				"ServiceDiscoveryTarget": "domain-service-grpc"
+				"ServiceDiscoveryTarget": "domain-service-grpc",
+				"ConsecutiveFailuresHealthPolicy.Threshold": "3"
 			},
 			"Destinations": {
 				"destination1": {
-					"Address": "https://localhost:8002"
+					"Address": "https://{{HOST}}:{{PORT}}"
 				}
 			},
 			"HttpRequest": {
 				"Version": "2.0"
+			},
+			"HealthCheck": {
+				"Active": {
+					"Enabled": true,
+					"Interval": "00:00:10",
+					"Timeout": "00:00:10",
+					"Policy": "ConsecutiveFailures",
+					"Path": "/health"
+				}
 			}
 		}
 	]

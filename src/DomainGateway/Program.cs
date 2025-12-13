@@ -82,15 +82,21 @@ else
 	throw new Exception("No Gateway configuration provider found in setup.");
 }
 
-builder.Services.AddReverseProxy().AddTransforms(builderContext =>
-{
-	builderContext.AddRequestTransform(async transformContext =>
+builder.Services.AddReverseProxy()
+	.ConfigureHttpClient((context, handler) =>
 	{
-		var request = transformContext.HttpContext.Request;
-		Console.WriteLine($"YARP Request handling: {request.HttpContext} mapped to {transformContext.DestinationPrefix}");
-		await Task.CompletedTask;
-	});
-}); //.LoadFromMemory([], []);
+		// handler.MaxConnectionsPerServer = 100;
+		// handler.EnableMultipleHttp2Connections = true;
+	})
+	.AddTransforms(builderContext =>
+	{
+		builderContext.AddRequestTransform(async transformContext =>
+		{
+			var request = transformContext.HttpContext.Request;
+			Console.WriteLine($"YARP Request handling: {request.HttpContext} mapped to {transformContext.DestinationPrefix}");
+			await Task.CompletedTask;
+		});
+	}); //.LoadFromMemory([], []);
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
