@@ -1,3 +1,5 @@
+using DomainGateway.Client.Core.Models;
+
 namespace DomainGateway.ServiceDiscovery;
 
 public interface IServiceDiscoveryInstancesRepository

@@ -2,7 +2,6 @@ using DomainGateway.Configurations;
 using DomainGateway.Contracts;
 using DomainGateway.Infrastructure;
 using DomainGateway.ServiceDiscovery;
-using SoftEEring.Core.Helpers;
 using Yarp.ReverseProxy.Configuration;
 
 namespace DomainGateway.ConfigurationProviders;
@@ -18,7 +17,7 @@ static class Extensions
 			return clusters // .Where(c => c.Metadata?.ContainsKey(ServiceDiscoveryMetadataKey) == true)
 				.GroupBy(cluster => cluster.Metadata?[ServiceDiscoveryMetadataKey])
 				.Where(group => group.Key is not null)
-				.ToDictionary(g => g.Key, g => g.ToList());
+				.ToDictionary(g => g.Key, g => g.ToList())!;
 		}
 	}
 }

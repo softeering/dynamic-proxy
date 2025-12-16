@@ -36,6 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\DomainGateway.Client.Core\DomainGateway.Client.Core.csproj" />
 		<ProjectReference Include="..\DomainGateway.Client\DomainGateway.Client.csproj" />
 		<ProjectReference Include="..\DomainGateway.ServiceDefaults\DomainGateway.ServiceDefaults.csproj"/>
 	</ItemGroup>

@@ -1,3 +1,4 @@
+using DomainGateway.Client.Core.Models;
 using DomainGateway.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,3 +1,6 @@
+using DomainGateway.Client.Core.Models;
+using DomainGateway.ServiceDiscovery.Client.Configuration;
+using DomainGateway.ServiceDiscovery.Client.Utils;
 using DomainServiceGrpc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
+
+var serviceDiscoConfiguration = builder.Configuration.GetSection("ServiceDiscovery").Get<ServiceDiscoveryConfiguration>()!;
+builder.Services.AddServiceDiscoveryClient(serviceDiscoConfiguration.Client);
+builder.Services.AddServiceDiscoveryRegistry(serviceDiscoConfiguration.Registry);
 
 var app = builder.Build();
 

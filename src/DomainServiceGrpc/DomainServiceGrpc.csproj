@@ -22,4 +22,8 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\DomainGateway.ServiceDiscovery.Client\DomainGateway.ServiceDiscovery.Client.csproj" />
+    </ItemGroup>
+
 </Project>

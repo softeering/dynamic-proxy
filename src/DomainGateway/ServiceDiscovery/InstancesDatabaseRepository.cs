@@ -1,4 +1,5 @@
 using System.Text.Json;
+using DomainGateway.Client.Core.Models;
 using DomainGateway.Database;
 using DomainGateway.Infrastructure;
 using Microsoft.EntityFrameworkCore;

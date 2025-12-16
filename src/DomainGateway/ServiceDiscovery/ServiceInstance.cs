@@ -1,21 +1,25 @@
 using System.Text.Json;
+using DomainGateway.Client.Core.Models;
 using SoftEEring.Core.Helpers;
 
 namespace DomainGateway.ServiceDiscovery;
 
-public record ServiceInstance(string ServiceName, string InstanceId, string? ServiceVersion, string Host, int Port, IDictionary<string, string>? Metadata)
+public static class ServiceInstanceExtensions 
 {
-	public ServiceInstanceEntity ToServiceInstanceEntity()
+	extension(ServiceInstance si)
 	{
-		return new ServiceInstanceEntity
+		public ServiceInstanceEntity ToServiceInstanceEntity()
 		{
-			ServiceName = this.ServiceName,
-			InstanceId = this.InstanceId,
-			ServiceVersion = this.ServiceVersion,
-			Host = this.Host,
-			Port = this.Port,
-			MetadataValue = this.Metadata?.Let(m => JsonSerializer.Serialize(m))
-		};
+			return new ServiceInstanceEntity
+			{
+				ServiceName = si.ServiceName,
+				InstanceId = si.InstanceId,
+				ServiceVersion = si.ServiceVersion,
+				Host = si.Host,
+				Port = si.Port,
+				MetadataValue = si.Metadata?.Let(m => JsonSerializer.Serialize(m))
+			};
+		}
 	}
 }
 

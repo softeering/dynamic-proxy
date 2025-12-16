@@ -1,0 +1,3 @@
+namespace DomainGateway.ServiceDiscovery.Client.Configuration;
+
+public record ServiceDiscoveryConfiguration(ServiceDiscoveryClientConfiguration Client, ServiceDiscoveryRegistryConfiguration? Registry);
