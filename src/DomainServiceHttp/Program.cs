@@ -1,22 +1,16 @@
+using DomainGateway.ServiceDiscovery.Client.Configuration;
+using DomainGateway.ServiceDiscovery.Client.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 const string defaultFromCurrency = "USD";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var serviceDiscoConfiguration = builder.Configuration.GetSection("ServiceDiscovery").Get<ServiceDiscoveryConfiguration>()!;
+builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-	app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
 
 app.MapGet("/exchangerate", async ([FromQuery] string? fromCurrency = null) =>
 	{

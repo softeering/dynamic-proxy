@@ -10,6 +10,13 @@ namespace DomainGateway.ServiceDiscovery;
 [Route("api/[controller]")]
 public class ServiceDiscoveryController(ILogger<ServiceDiscoveryController> logger, IServiceDiscoveryInstancesRepository repository) : ControllerBase
 {
+	[HttpGet("instances")]
+	public async Task<IActionResult> GetServiceInstances(CancellationToken cancellationToken)
+	{
+		var instances = await repository.GetAllRegisteredInstancesAsync(cancellationToken);
+		return Ok(instances.Select(i => i.ToServiceInstance()));
+	}
+
 	[HttpGet("{serviceName}/instances")]
 	public async Task<IActionResult> GetServiceInstances(string serviceName, CancellationToken cancellationToken)
 	{

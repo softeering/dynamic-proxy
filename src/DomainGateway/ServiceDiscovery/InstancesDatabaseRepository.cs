@@ -8,6 +8,11 @@ namespace DomainGateway.ServiceDiscovery;
 
 public class InstancesDatabaseRepository(ILogger<InstancesDatabaseRepository> logger, DomainGatewayDbContext database) : IServiceDiscoveryInstancesRepository
 {
+	public Task<List<ServiceInstanceEntity>> GetAllRegisteredInstancesAsync(CancellationToken cancellationToken = default)
+	{
+		return database.Instances.ToListAsync(cancellationToken);
+	}
+
 	public Task<List<ServiceInstanceEntity>> GetRegisteredInstancesAsync(string serviceName, CancellationToken cancellationToken = default)
 	{
 		return database.Instances

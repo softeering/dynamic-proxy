@@ -1,0 +1,66 @@
+﻿@page "/service-registry"
+@using DomainGateway.Client.Core.Models
+
+@inject HttpClient Http
+
+<PageTitle>Service Registry</PageTitle>
+
+<h1>Services</h1>
+
+@if (services == null)
+{
+	<p>
+		<em>Loading...</em>
+	</p>
+}
+else if (!string.IsNullOrEmpty(message))
+{
+	<p>@message</p>
+}
+else
+{
+	foreach (var (service, instances) in services)
+	{
+		<h3>@service</h3>
+		<table class="table">
+			<thead>
+			<tr>
+				<th>Host</th>
+				<th>Port</th>
+				<th>Version</th>
+			</tr>
+			</thead>
+			<tbody>
+			@foreach (var instance in instances)
+			{
+				<tr>
+					<td>@instance.Host</td>
+					<td>@instance.Port</td>
+					<td>@instance.ServiceVersion</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	}
+}
+
+@code {
+	private Dictionary<string, ServiceInstance[]>? services;
+	private string? message;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var result = await Http.GetFromJsonAsync<List<ServiceInstance>>("api/servciediscovery/instances");
+
+		if (result is not null)
+		{
+			services = result.GroupBy(s => s.ServiceName)
+				.ToDictionary(s => s.Key, s => s.ToArray());
+		}
+		else
+		{
+			this.message = "No services are currently registered.";
+		}
+	}
+
+}

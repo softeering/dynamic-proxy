@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\DomainGateway.Client.Core\DomainGateway.Client.Core.csproj" />
+      <ProjectReference Include="..\DomainGateway.ServiceDiscovery.Client\DomainGateway.ServiceDiscovery.Client.csproj" />
     </ItemGroup>
 
 </Project>

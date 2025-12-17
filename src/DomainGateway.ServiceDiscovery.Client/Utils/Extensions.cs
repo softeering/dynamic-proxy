@@ -29,25 +29,30 @@ public static class Extensions
 		return services;
 	}
 
-	public static IServiceCollection AddServiceDiscoveryRegistry(
+	public static IServiceCollection AddServiceDiscoveryClientWithRegistry(
 		this IServiceCollection services,
-		ServiceDiscoveryRegistryConfiguration configuration,
+		ServiceDiscoveryConfiguration configuration,
 		string? instanceId = null
 	)
 	{
+		if (configuration.Registry is null)
+			throw new ArgumentNullException(nameof(configuration.Registry));
+
 		var address = HostHelper.GetLocalIPv4();
 
 		if (address is null)
 			throw new Exception("Host address not defined");
 
+		services.AddServiceDiscoveryClient(configuration.Client);
+
 		var finalInstanceId = instanceId ?? Guid.NewGuid().ToString();
-		
+
 		var instance = new ServiceInstance(
-			ServiceName: configuration.ServiceName,
+			ServiceName: configuration.Registry.ServiceName,
 			InstanceId: finalInstanceId,
-			ServiceVersion: configuration.ServiceVersion,
+			ServiceVersion: configuration.Registry.ServiceVersion,
 			Host: address.ToString(),
-			Port: configuration.ServicePort,
+			Port: configuration.Registry.ServicePort,
 			Metadata: null
 		);
 

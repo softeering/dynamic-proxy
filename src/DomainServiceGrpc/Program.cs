@@ -1,4 +1,3 @@
-using DomainGateway.Client.Core.Models;
 using DomainGateway.ServiceDiscovery.Client.Configuration;
 using DomainGateway.ServiceDiscovery.Client.Utils;
 using DomainServiceGrpc.Services;
@@ -10,8 +9,7 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 
 var serviceDiscoConfiguration = builder.Configuration.GetSection("ServiceDiscovery").Get<ServiceDiscoveryConfiguration>()!;
-builder.Services.AddServiceDiscoveryClient(serviceDiscoConfiguration.Client);
-builder.Services.AddServiceDiscoveryRegistry(serviceDiscoConfiguration.Registry);
+builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration);
 
 var app = builder.Build();
 
