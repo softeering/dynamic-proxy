@@ -14,7 +14,8 @@ static class Extensions
 	{
 		public IDictionary<string, List<ClusterConfig>> GetServiceDiscoveryBasedClusters()
 		{
-			return clusters // .Where(c => c.Metadata?.ContainsKey(ServiceDiscoveryMetadataKey) == true)
+			return clusters
+				.Where(c => c.Metadata?.ContainsKey(ServiceDiscoveryMetadataKey) == true)
 				.GroupBy(cluster => cluster.Metadata?[ServiceDiscoveryMetadataKey])
 				.Where(group => group.Key is not null)
 				.ToDictionary(g => g.Key, g => g.ToList())!;

@@ -21,7 +21,7 @@ app.MapGet("/exchangerate", async ([FromQuery] string? fromCurrency = null) =>
 	})
 	.WithName("get-exchange-rates");
 
-app.MapGet("/heath", () => Results.Ok(new { Healthy = true })).WithName("health-indicator");
+app.MapGet("/health", () => Results.Ok(new { Healthy = true })).WithName("health-indicator");
 
 await app.RunAsync();
 

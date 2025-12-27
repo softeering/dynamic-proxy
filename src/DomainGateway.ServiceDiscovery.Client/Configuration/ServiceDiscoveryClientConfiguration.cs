@@ -1,7 +1,7 @@
 namespace DomainGateway.ServiceDiscovery.Client.Configuration;
 
 public record ServiceDiscoveryClientConfiguration(
-	string Host,
+	string BaseUrl,
 	string ClientId,
 	int? HttpTimeoutSeconds = null
 )

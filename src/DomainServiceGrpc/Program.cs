@@ -17,6 +17,6 @@ var app = builder.Build();
 app.MapGrpcService<ExchangeRateService>();
 app.MapGrpcReflectionService();
 app.MapGet("/", () => new { Error = "Communication with gRPC endpoints must be made through a gRPC client" });
-app.MapGet("/heath", () => Results.Ok(new { Healthy = true })).WithName("health-indicator");
+app.MapGet("/health", () => Results.Ok(new { Healthy = true })).WithName("health-indicator");
 
 await app.RunAsync();

@@ -26,7 +26,7 @@
 			},
 			"Transforms": [
 				{
-					"PathRemovePrefix": "/api/exchangerate"
+					"PathPattern": "/exchangerate"
 				}
 			]
 		},
@@ -54,7 +54,7 @@
 			},
 			"Destinations": {
 				"exchangeRateService": {
-					"Address": "https://localhost:7002/exchangerate"
+					"Address": "https://localhost:7002"
 				}
 			},
 			"HealthCheck": {

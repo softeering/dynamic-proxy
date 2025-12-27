@@ -12,11 +12,35 @@ using DomainGateway.Infrastructure;
 using DomainGateway.ServiceDiscovery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
 using SoftEEring.Core.Helpers;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// remove logger providers and register OTel only
+builder.Logging.ClearProviders();
+builder.Logging.AddOpenTelemetry(options =>
+{
+	options.SetResourceBuilder(ResourceBuilder.CreateEmpty()
+		.AddService("DomainGateway")
+		.AddAttributes(new Dictionary<string, object>
+		{
+			["environment"] = builder.Environment.EnvironmentName
+		}));
+
+	options.AddConsoleExporter();
+
+	// USE SEQ for OTEL
+	// options.AddOtlpExporter(otlpOptions =>
+	// {
+	// 	otlpOptions.Endpoint = new Uri("https://localhost:8500");
+	// 	otlpOptions.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+	// 	otlpOptions.Headers = "api-key=your_api_key";
+	// });
+});
 
 builder.AddServiceDefaults();
 

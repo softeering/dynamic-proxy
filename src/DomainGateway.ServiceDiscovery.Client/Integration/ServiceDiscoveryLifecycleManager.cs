@@ -1,4 +1,5 @@
 using DomainGateway.Client.Core.Models;
+using DomainGateway.ServiceDiscovery.Client.Configuration;
 using DomainGateway.ServiceDiscovery.Client.Contracts;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ namespace DomainGateway.ServiceDiscovery.Client.Integration;
 public class ServiceDiscoveryLifecycleManager : IHostedService
 {
 	private readonly ILogger _logger;
+	private readonly ServiceDiscoveryRegistryConfiguration _configuration;
 	private readonly ServiceInstance _instance;
 	private readonly IServiceDiscoveryClient _client;
 	private readonly IHostApplicationLifetime? _lifetime;
@@ -15,12 +17,14 @@ public class ServiceDiscoveryLifecycleManager : IHostedService
 
 	public ServiceDiscoveryLifecycleManager(
 		ILogger<ServiceDiscoveryLifecycleManager> logger,
+		ServiceDiscoveryRegistryConfiguration configuration,
 		ServiceInstance instance,
 		IServiceDiscoveryClient client,
 		IHostApplicationLifetime? lifetime = null
 	)
 	{
 		this._logger = logger;
+		this._configuration = configuration;
 		this._instance = instance;
 		this._client = client;
 		this._lifetime = lifetime;
@@ -51,7 +55,9 @@ public class ServiceDiscoveryLifecycleManager : IHostedService
 
 		_ = Task.Factory.StartNew(async () =>
 		{
-			while (!cancellationToken.IsCancellationRequested)
+			using var timer = new PeriodicTimer(TimeSpan.FromSeconds(this._configuration.HeartBeatIntervalSeconds));
+
+			while (!cancellationToken.IsCancellationRequested && await timer.WaitForNextTickAsync(cancellationToken))
 			{
 				try
 				{

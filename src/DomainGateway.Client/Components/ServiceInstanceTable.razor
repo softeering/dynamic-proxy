@@ -1,0 +1,31 @@
+@using DomainGateway.Client.Core.Models
+
+<h3>@ServiceName</h3>
+<table class="table">
+	<thead>
+	<tr>
+		<th>Host</th>
+		<th>Port</th>
+		<th>Version</th>
+	</tr>
+	</thead>
+	<tbody>
+	@foreach (var instance in Instances)
+	{
+		<tr>
+			<td>@instance.Host</td>
+			<td>@instance.Port</td>
+			<td>@instance.ServiceVersion</td>
+		</tr>
+	}
+	</tbody>
+</table>
+
+@code {
+	[Parameter]
+	public string ServiceName { get; set; } = string.Empty;
+
+	[Parameter]
+	public ServiceInstance[] Instances { get; set; } = [];
+}
+

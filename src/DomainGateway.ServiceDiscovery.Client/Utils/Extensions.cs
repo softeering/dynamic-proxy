@@ -19,9 +19,9 @@ public static class Extensions
 		services.AddHttpClient<IServiceDiscoveryClient, ServiceDiscoveryHttpClient>()
 			.ConfigureHttpClient(client =>
 			{
-				client.BaseAddress = new Uri(configuration.Host.TrimEnd('/'));
+				client.BaseAddress = new Uri(configuration.BaseUrl.TrimEnd('/'));
 				client.DefaultRequestHeaders.Add("Client-ID", configuration.ClientId);
-				client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+				// client.DefaultRequestHeaders.Add("Content-Type", "application/json");
 				client.DefaultRequestHeaders.Add("Accept", "application/json");
 				client.Timeout = TimeSpan.FromSeconds(configuration.HttpTimeoutSeconds ?? ServiceDiscoveryClientConfiguration.DefaultHttpTimeoutSeconds);
 			});
@@ -55,8 +55,9 @@ public static class Extensions
 			Port: configuration.Registry.ServicePort,
 			Metadata: null
 		);
-
+		
 		services.AddSingleton(instance);
+		services.AddSingleton(configuration.Registry);
 		services.AddHostedService<ServiceDiscoveryLifecycleManager>();
 
 		return services;
