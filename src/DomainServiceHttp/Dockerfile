@@ -1,13 +1,18 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+﻿# dotnet publish -c Release -r linux-x64 -p:PublishProfile=DefaultContainer -p:ContainerRepository=domainservicehttp
+# docker build -t domainservicehttp -f DomainServiceHttp/Dockerfile .
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 7001
+EXPOSE 7002
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["DomainServiceHttp/DomainServiceHttp.csproj", "DomainServiceHttp/"]
+COPY [ "DomainGateway.Client.Core/DomainGateway.Client.Core.csproj", "DomainGateway.Client.Core/" ]
+COPY [ "DomainGateway.ServiceDiscovery.Client/DomainGateway.ServiceDiscovery.Client.csproj", "DomainGateway.ServiceDiscovery.Client/" ]
+COPY [ "DomainServiceHttp/DomainServiceHttp.csproj", "DomainServiceHttp/" ]
 RUN dotnet restore "DomainServiceHttp/DomainServiceHttp.csproj"
 COPY . .
 WORKDIR "/src/DomainServiceHttp"
