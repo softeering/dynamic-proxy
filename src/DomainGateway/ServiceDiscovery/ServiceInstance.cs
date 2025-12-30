@@ -37,6 +37,6 @@ public class ServiceInstanceEntity
 	public ServiceInstance ToServiceInstance()
 	{
 		var metadata = string.IsNullOrWhiteSpace(this.MetadataValue) ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(this.MetadataValue);
-		return new ServiceInstance(this.InstanceId, this.ServiceName, this.ServiceVersion, this.Host, this.Port, metadata);
+		return new ServiceInstance(this.ServiceName, this.InstanceId, this.ServiceVersion, this.Host, this.Port, metadata);
 	}
 }

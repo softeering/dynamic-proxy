@@ -24,6 +24,13 @@ public class ServiceDiscoveryController(ILogger<ServiceDiscoveryController> logg
 		return Ok(instances.Select(i => i.ToServiceInstance()));
 	}
 
+	[HttpGet("{serviceName}/instances/{instanceId}")]
+	public async Task<IActionResult> GetServiceInstance(string serviceName, string instanceId, CancellationToken cancellationToken)
+	{
+		var instance = await repository.GetRegisteredInstanceAsync(serviceName, instanceId, cancellationToken);
+		return instance is null ? NotFound() : Ok(instance.ToServiceInstance());
+	}
+
 	[HttpDelete("{serviceName}/{instanceId}")]
 	public async Task<IActionResult> DeregisterInstance(string serviceName, string instanceId, CancellationToken cancellationToken)
 	{
@@ -40,7 +47,7 @@ public class ServiceDiscoveryController(ILogger<ServiceDiscoveryController> logg
 			throw new ArgumentException("serviceName in URL does not match serviceName in body");
 
 		await repository.RegisterInstanceAsync(model, cancellationToken);
-		return Ok();
+		return CreatedAtAction(nameof(GetServiceInstance), new { serviceName = model.ServiceName, instanceId = model.InstanceId }, null);
 	}
 
 	[HttpPut("{serviceName}/ping")]

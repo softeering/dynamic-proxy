@@ -1,16 +1,17 @@
 @baseUrl = https://localhost:5001
 @testService = service-test
+@instanceId = instance-1
 
 ###################
 ### Servcie discovery - register instance
 ###################
-POST {{baseUrl}}/servicediscovery/{{testService}}/register
+POST {{baseUrl}}/api/servicediscovery/{{testService}}/register
 Content-Type: application/json
 Client-Id: test-client
 
 {
   "serviceName": "{{testService}}",
-  "instanceId": "instance-1",
+  "instanceId": "{{instanceId}}",
   "serviceVersion": "1.0.0",
   "host": "localhost",
   "port": 6000,
@@ -20,22 +21,36 @@ Client-Id: test-client
 }
 
 ###################
-### Servcie discovery - list instances
+### Servcie discovery - list all instances
 ###################
-GET {{baseUrl}}/servicediscovery/{{testService}}/instances
+GET {{baseUrl}}/api/servicediscovery/instances
+Accept: application/json
+Client-Id: test-client
+
+###################
+### Servcie discovery - list instances for test service
+###################
+GET {{baseUrl}}/api/servicediscovery/{{testService}}/instances
+Accept: application/json
+Client-Id: test-client
+
+###################
+### Servcie discovery - list instance with test id
+###################
+GET {{baseUrl}}/api/servicediscovery/{{testService}}/instances/{{instanceId}}
 Accept: application/json
 Client-Id: test-client
 
 ###################
 ### Servcie discovery - heartbeat
 ###################
-PUT {{baseUrl}}/servicediscovery/{{testService}}/ping
+PUT {{baseUrl}}/api/servicediscovery/{{testService}}/ping
 Content-Type: application/json
 Client-Id: test-client
 
 {
   "serviceName": "{{testService}}",
-  "instanceId": "instance-1",
+  "instanceId": "{{instanceId}}",
   "serviceVersion": "1.0.1",
   "host": "localhost",
   "port": 6000,
@@ -45,7 +60,7 @@ Client-Id: test-client
 }
 
 ###################
-### Servcie discovery - re-register
+### Servcie discovery - de-register
 ###################
-DELETE {{baseUrl}}/servicediscovery/{{testService}}/instance-1
+DELETE {{baseUrl}}/api/servicediscovery/{{testService}}/{{instanceId}}
 Client-Id: test-client

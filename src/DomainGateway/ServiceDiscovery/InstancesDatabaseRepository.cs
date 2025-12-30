@@ -15,28 +15,44 @@ public class InstancesDatabaseRepository(ILogger<InstancesDatabaseRepository> lo
 
 	public Task<List<ServiceInstanceEntity>> GetRegisteredInstancesAsync(string serviceName, CancellationToken cancellationToken = default)
 	{
+		var filter = serviceName.ToLower();
+
 		return database.Instances
-			.Where(i => i.ServiceName.Equals(serviceName))
+			.Where(i => i.ServiceName.Equals(filter))
 			.ToListAsync(cancellationToken);
+	}
+
+	public Task<ServiceInstanceEntity?> GetRegisteredInstanceAsync(string serviceName, string instanceId, CancellationToken cancellationToken = default)
+	{
+		var filter = serviceName.ToLower();
+
+		return database.Instances
+			.FirstOrDefaultAsync(i => i.ServiceName.Equals(filter), cancellationToken: cancellationToken);
 	}
 
 	public Task RegisterInstanceAsync(ServiceInstance instance, CancellationToken cancellationToken = default)
 	{
-		database.Instances.Add(instance.ToServiceInstanceEntity());
+		var entity = instance.ToServiceInstanceEntity();
+		entity.RegistrationTime = DateTimeOffset.UtcNow;
+		database.Instances.Update(entity);
 		return database.SaveChangesAsync(cancellationToken);
 	}
 
 	public Task DeregisterInstanceAsync(string serviceName, string instanceId, CancellationToken cancellationToken = default)
 	{
+		var filter = serviceName.ToLower();
+
 		return database.Instances
-			.Where(i => i.ServiceName.Equals(serviceName) && i.InstanceId.Equals(instanceId))
+			.Where(i => i.ServiceName.Equals(filter) && i.InstanceId.Equals(instanceId))
 			.ExecuteDeleteAsync(cancellationToken);
 	}
 
 	public async Task PingAsync(ServiceInstance instance, CancellationToken cancellationToken = default)
 	{
+		var filter = instance.ServiceName.ToLower();
+
 		var saved = await database.Instances
-			.FirstOrDefaultAsync(i => i.ServiceName.Equals(instance.ServiceName) && i.InstanceId.Equals(instance.InstanceId), cancellationToken)
+			.FirstOrDefaultAsync(i => i.ServiceName.Equals(filter) && i.InstanceId.Equals(instance.InstanceId), cancellationToken)
 			.ConfigureAwait(false);
 
 		if (saved is null)

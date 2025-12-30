@@ -6,5 +6,5 @@ public record ServiceDiscoveryClientConfiguration(
 	int? HttpTimeoutSeconds = null
 )
 {
-	public const int DefaultHttpTimeoutSeconds = 15;
+	public const int DefaultHttpTimeoutSeconds = 5;
 }
