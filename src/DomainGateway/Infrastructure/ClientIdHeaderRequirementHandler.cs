@@ -11,17 +11,17 @@ public record ClientIdHeaderRequirement(string HeaderName) : IAuthorizationRequi
 	}
 }
 
-public class ClientIdHeaderRequirementHandler(IGatewayConfigurationService gatewayConfigurationService) : AuthorizationHandler<ClientIdHeaderRequirement>
+public class ClientIdHeaderRequirementHandler(IGatewayConfigurationService gatewayConfigurationService, IHttpContextAccessor httpContextAccessor) : AuthorizationHandler<ClientIdHeaderRequirement>
 {
 	public const string PolicyName = "ClientIdHeaderPolicy";
 	
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ClientIdHeaderRequirement requirement)
 	{
-		// var httpContext = (context.Resource as Microsoft.AspNetCore.Mvc.Filters.AuthorizationFilterContext)?.HttpContext;
-		if (context.Resource is DefaultHttpContext httpContext && httpContext.Request.Headers.TryGetValue(requirement.HeaderName, out var value) && value.Count > 0)
+		var httpContext = context.Resource as HttpContext ?? httpContextAccessor.HttpContext;
+		if (httpContext is not null && httpContext.Request.Headers.TryGetValue(requirement.HeaderName, out var value) && value.Count > 0)
 		{
 			var allowedClients = gatewayConfigurationService.GetServiceDiscoveryConfiguration().AllowedClients;
-			if (requirement.IsAllowed(value) && allowedClients.Contains(value!))
+			if (requirement.IsAllowed(value) && (allowedClients is null || allowedClients.Contains(value!)))
 			{
 				context.Succeed(requirement);
 			}

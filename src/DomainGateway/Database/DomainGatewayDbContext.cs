@@ -25,6 +25,9 @@ public class DomainGatewayDbContext(DbContextOptions<DomainGatewayDbContext> opt
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
+		if (optionsBuilder.IsConfigured)
+			return;
+
 		var connectionString = configuration.GetConnectionString("DefaultConnection")!;
 		var schemeEnd = connectionString.IndexOf("://", StringComparison.Ordinal);
 		if (schemeEnd < 0)

@@ -16,14 +16,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" Version="4.0.14" />
-		<PackageReference Include="Microsoft.AspNetCore.App.Internal.Assets" Version="10.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+		<PackageReference Include="AWSSDK.S3" Version="4.0.16.1" />
+		<PackageReference Include="Microsoft.AspNetCore.App.Internal.Assets" Version="10.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0"/>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.1" />
 		<PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.9"/>
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.14.0" />
@@ -33,7 +33,7 @@
 		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0"/>
 		<PackageReference Include="SoftEEring.Core" Version="2.7.1"/>
 		<PackageReference Include="Yarp.ReverseProxy" Version="2.3.0"/>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.0"/>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

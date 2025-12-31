@@ -125,6 +125,7 @@ builder.Services.AddReverseProxy()
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IServiceDiscoveryInstancesRepository, InstancesDatabaseRepository>();
 builder.Services.AddAuthorization(options =>
 {
@@ -149,7 +150,11 @@ if (configuration.EnableAdminPortal)
 var app = builder.Build();
 
 // migrate database on startup
-app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ => dbContext.Database.Migrate());
+app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ =>
+{
+	if (dbContext.Database.IsRelational())
+		dbContext.Database.Migrate();
+});
 
 // await app.Services.GetRequiredService<IGatewayConfigurationProvider>().RefreshProxyConfigurationAsync();
 app.UseExceptionHandler();
@@ -165,7 +170,7 @@ app.MapGet("/info", () => Results.Ok(new
 app.MapDefaultEndpoints();
 app.MapStaticAssets();
 
-if (configuration.ExposeConfigurationsEndpoint)
+if (configuration.ExposeConfigurationEndpoints)
 {
 	var prefix = configuration.ConfigurationsEndpointPrefix.Trim('/') + "/";
 	app.MapGet($"/{prefix}setup", (IOptions<DomainGatewaySetup> options) => Results.Json(options.Value));
@@ -198,3 +203,6 @@ if (configuration.EnableAdminPortal)
 }
 
 await app.RunAsync();
+
+public partial class Program { }
+

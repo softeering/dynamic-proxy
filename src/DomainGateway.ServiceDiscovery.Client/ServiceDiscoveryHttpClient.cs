@@ -15,21 +15,28 @@ public sealed class ServiceDiscoveryHttpClient : IServiceDiscoveryClient
 
 	public Task<List<ServiceInstance>> ListInstancesAsync(string serviceName, CancellationToken cancellationToken = default)
 	{
-		return this._httpClient.GetFromJsonAsync<List<ServiceInstance>>($"api/ServiceDiscovery/{serviceName}/instances", cancellationToken)!;
+		return this._httpClient.GetFromJsonAsync<List<ServiceInstance>>($"api/servicediscovery/{serviceName}/instances", cancellationToken)!;
 	}
 
 	public Task RegisterAsync(ServiceInstance instance, CancellationToken cancellationToken = default)
 	{
-		return this._httpClient.PostAsJsonAsync($"api/ServiceDiscovery/{instance.ServiceName}/register", instance, cancellationToken);
+		return this._httpClient.PostAsJsonAsync($"api/servicediscovery/{instance.ServiceName}/register", instance, cancellationToken);
 	}
 
-	public Task PingAsync(ServiceInstance instance, CancellationToken cancellationToken = default)
+	public async Task PingAsync(ServiceInstance instance, CancellationToken cancellationToken = default)
 	{
-		return this._httpClient.PutAsJsonAsync($"api/ServiceDiscovery/{instance.ServiceName}/ping", instance, cancellationToken);
+		try
+		{
+			await this._httpClient.PutAsJsonAsync($"api/servicediscovery/{instance.ServiceName}/ping", instance, cancellationToken).ConfigureAwait(false);
+		}
+		catch (Exception exception)
+		{
+			// Swallow exceptions for ping failures
+		}
 	}
 
 	public Task DeregisterAsync(string serviceName, string instanceId, CancellationToken cancellationToken = default)
 	{
-		return this._httpClient.DeleteAsync($"api/ServiceDiscovery/{serviceName}/deregister/{instanceId}", cancellationToken);
+		return this._httpClient.DeleteAsync($"api/servicediscovery/{serviceName}/deregister/{instanceId}", cancellationToken);
 	}
 }
