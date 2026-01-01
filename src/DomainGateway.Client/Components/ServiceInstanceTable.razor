@@ -1,6 +1,6 @@
 @using DomainGateway.Client.Core.Models
 
-<h3>@ServiceName</h3>
+<h3>@this.ServiceName</h3>
 <table class="table">
 	<thead>
 	<tr>
@@ -10,7 +10,7 @@
 	</tr>
 	</thead>
 	<tbody>
-	@foreach (var instance in Instances)
+	@foreach (var instance in this.Instances)
 	{
 		<tr>
 			<td>@instance.Host</td>

@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DomainGateway.ServiceDiscovery;
 
-[Authorize(Policy = ClientIdHeaderRequirementHandler.PolicyName)]
+// [Authorize(Policy = ClientIdHeaderRequirementHandler.PolicyName)]
 [ApiController]
 [Route("api/[controller]")]
 public class ServiceDiscoveryController(ILogger<ServiceDiscoveryController> logger, IServiceDiscoveryInstancesRepository repository) : ControllerBase
 {
 	[HttpGet("instances")]
-	public async Task<IActionResult> GetServiceInstances(CancellationToken cancellationToken)
+	public async Task<IActionResult> GetInstances(CancellationToken cancellationToken)
 	{
 		var instances = await repository.GetAllRegisteredInstancesAsync(cancellationToken);
 		return Ok(instances.Select(i => i.ToServiceInstance()));

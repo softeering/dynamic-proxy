@@ -22,7 +22,7 @@ else
 {
 	@foreach (var (serviceName, instances) in services)
 	{
-		<ServiceInstanceTable ServiceName="serviceName" Instances="instances"/>
+		<ServiceInstanceTable ServiceName="@serviceName" Instances="@instances"/>
 	}
 }
 
@@ -32,7 +32,7 @@ else
 
 	protected override async Task OnInitializedAsync()
 	{
-		var result = await Http.GetFromJsonAsync<List<ServiceInstance>>("api/servciediscovery/instances");
+		var result = await Http.GetFromJsonAsync<List<ServiceInstance>>("api/servicediscovery/instances");
 
 		if (result is not null && result.Any())
 		{
@@ -44,4 +44,5 @@ else
 			this.message = "No services are currently registered.";
 		}
 	}
+
 }

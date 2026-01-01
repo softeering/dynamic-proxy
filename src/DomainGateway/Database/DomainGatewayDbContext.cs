@@ -1,5 +1,6 @@
 using DomainGateway.ServiceDiscovery;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DomainGateway.Database;
 
@@ -61,10 +62,13 @@ public class DomainGatewayDbContext(DbContextOptions<DomainGatewayDbContext> opt
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<ServiceInstanceEntity>()
-			.HasKey(e => new { e.ServiceName, e.InstanceId });
+		var serviceNameConverter = new ValueConverter<string, string>(v => v.ToLowerInvariant(), v => v);
 
-		modelBuilder.Entity<ServiceInstanceEntity>()
-			.HasIndex(e => e.ServiceName);
+		modelBuilder.Entity<ServiceInstanceEntity>(entity =>
+		{
+			entity.HasKey(e => new { e.ServiceName, e.InstanceId });
+			entity.Property(e => e.ServiceName).HasConversion(serviceNameConverter);
+			entity.HasIndex(e => e.ServiceName);
+		});
 	}
 }

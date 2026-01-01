@@ -12,7 +12,7 @@ public static class ServiceInstanceExtensions
 		{
 			return new ServiceInstanceEntity
 			{
-				ServiceName = si.ServiceName,
+				ServiceName = si.ServiceName.ToLower(),
 				InstanceId = si.InstanceId,
 				ServiceVersion = si.ServiceVersion,
 				Host = si.Host,
