@@ -22,7 +22,7 @@ public static class Extensions
 				client.BaseAddress = new Uri(configuration.BaseUrl.TrimEnd('/'));
 				client.DefaultRequestHeaders.Add("Client-Id", configuration.ClientId);
 				// client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-				// client.DefaultRequestHeaders.Add("Accept", "application/json");
+				client.DefaultRequestHeaders.Add("Accept", "application/json");
 				client.Timeout = TimeSpan.FromSeconds(configuration.HttpTimeoutSeconds ?? ServiceDiscoveryClientConfiguration.DefaultHttpTimeoutSeconds);
 			});
 

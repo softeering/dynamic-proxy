@@ -204,5 +204,7 @@ if (configuration.EnableAdminPortal)
 
 await app.RunAsync();
 
-public partial class Program { }
-
+// partial class is needed for integration tests to access Program class
+public partial class Program
+{
+}

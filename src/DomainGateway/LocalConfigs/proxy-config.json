@@ -59,7 +59,7 @@
 			},
 			"HealthCheck": {
 				"Active": {
-					"Enabled": true,
+					"Enabled": false,
 					"Interval": "00:00:10",
 					"Timeout": "00:00:10",
 					"Policy": "ConsecutiveFailures",
@@ -84,7 +84,7 @@
 			},
 			"HealthCheck": {
 				"Active": {
-					"Enabled": true,
+					"Enabled": false,
 					"Interval": "00:00:10",
 					"Timeout": "00:00:10",
 					"Policy": "ConsecutiveFailures",

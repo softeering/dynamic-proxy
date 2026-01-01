@@ -24,6 +24,7 @@
     font-size: 1.1rem;
 }
 
+/*
 .bi {
     display: inline-block;
     position: relative;
@@ -32,6 +33,12 @@
     margin-right: 0.75rem;
     top: -1px;
     background-size: cover;
+}
+*/
+
+.bi {
+	font-size: x-large;
+	margin-right: 1rem;
 }
 
 .bi-house-door-fill-nav-menu {

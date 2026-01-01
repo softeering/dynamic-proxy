@@ -7,10 +7,9 @@ const string defaultFromCurrency = "USD";
 var builder = WebApplication.CreateBuilder(args);
 
 var serviceDiscoConfiguration = builder.Configuration.GetSection("ServiceDiscovery").Get<ServiceDiscoveryConfiguration>()!;
-builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration);
+builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration, HostHelper.GetLocalIPv4()?.ToString());
 
 var app = builder.Build();
-
 
 app.MapGet("/exchangerate", async ([FromQuery] string? fromCurrency = null) =>
 	{

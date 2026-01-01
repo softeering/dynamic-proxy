@@ -9,7 +9,7 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
 
 var serviceDiscoConfiguration = builder.Configuration.GetSection("ServiceDiscovery").Get<ServiceDiscoveryConfiguration>()!;
-builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration);
+builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration, HostHelper.GetLocalIPv4()?.ToString());
 
 var app = builder.Build();
 

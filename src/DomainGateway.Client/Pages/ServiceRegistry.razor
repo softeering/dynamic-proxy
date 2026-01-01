@@ -6,42 +6,77 @@
 
 <PageTitle>Service Registry</PageTitle>
 
-<h1>Services</h1>
+<div class="d-flex align-items-center justify-content-between mb-3">
+	<h1 class="mb-0">Services</h1>
+	<button class="btn btn-outline-primary btn-sm"
+	        @onclick="this.LoadServicesAsync"
+	        disabled="@this._isLoading">
+		<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-1">
+			<path d="M2 7a6 6 0 1 1 1.757 4.243" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+			<path d="M2 11.5V7H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		Refresh
+	</button>
+</div>
 
-@if (services == null)
-{
-	<p>
-		<em>Loading...</em>
-	</p>
-}
-else if (!string.IsNullOrEmpty(message))
-{
-	<p>@message</p>
-}
-else
-{
-	@foreach (var (serviceName, instances) in services)
+<div style="margin-top: 50px;">
+	@if (this._isLoading && this._services is null && string.IsNullOrEmpty(this._message))
 	{
-		<ServiceInstanceTable ServiceName="@serviceName" Instances="@instances"/>
+		<p><em>Loading...</em></p>
 	}
-}
+	else if (!string.IsNullOrEmpty(this._message))
+	{
+		<p>@this._message</p>
+	}
+	else if (this._services is not null)
+	{
+		@foreach (var (serviceName, instances) in this._services)
+		{
+			<ServiceInstanceTable ServiceName="@serviceName" Instances="@instances.ToList()"/>
+		}
+	}
+</div>
 
 @code {
-	private Dictionary<string, ServiceInstance[]>? services;
-	private string? message;
+	private Dictionary<string, ServiceInstance[]>? _services;
+	private string? _message;
+	private bool _isLoading;
 
 	protected override async Task OnInitializedAsync()
 	{
-		var result = await Http.GetFromJsonAsync<List<ServiceInstance>>("api/servicediscovery/instances");
+		await this.LoadServicesAsync();
+	}
 
-		if (result is not null && result.Any())
+	private async Task LoadServicesAsync()
+	{
+		this._isLoading = true;
+		this._message = null;
+
+		try
 		{
-			services = result.GroupBy(s => s.ServiceName)
-				.ToDictionary(s => s.Key, s => s.ToArray());
+			var result = await Http.GetFromJsonAsync<List<ServiceInstance>>("api/servicediscovery/instances");
+
+			if (result is null || result.Count == 0)
+			{
+				this._services = null;
+				this._message = "No services are currently registered.";
+			}
+			else
+			{
+				this._services = result
+					.GroupBy(s => s.ServiceName)
+					.OrderBy(s => s.Key)
+					.ToDictionary(s => s.Key, s => s.ToArray());
+			}
 		}
-		else
+		catch (Exception ex)
 		{
-			this.message = "No services are currently registered.";
+			this._services = null;
+			this._message = $"Failed to load services: {ex.Message}";
+		}
+		finally
+		{
+			this._isLoading = false;
 		}
 	}
 
