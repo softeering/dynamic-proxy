@@ -13,7 +13,7 @@ public record ClientIdHeaderRequirement(string HeaderName) : IAuthorizationRequi
 
 public class ClientIdHeaderRequirementHandler(IGatewayConfigurationService gatewayConfigurationService, IHttpContextAccessor httpContextAccessor) : AuthorizationHandler<ClientIdHeaderRequirement>
 {
-	public const string PolicyName = "ClientIdHeaderPolicy";
+	// public const string PolicyName = "ClientIdHeaderPolicy";
 	
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ClientIdHeaderRequirement requirement)
 	{

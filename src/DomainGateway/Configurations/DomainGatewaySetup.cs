@@ -2,7 +2,6 @@ namespace DomainGateway.Configurations;
 
 public class DomainGatewaySetup
 {
-	public required string ClientIdHeaderName { get; init; }
 	public bool ExposeConfigurationEndpoints { get; init; }
 	public bool EnableAdminPortal { get; init; }
 	public string ConfigurationsEndpointPrefix { get; init; } = "/configurations";

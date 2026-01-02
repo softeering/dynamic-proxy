@@ -1,4 +1,5 @@
 using DomainGateway.Configurations;
+using DomainGateway.RateLimiting;
 
 namespace DomainGateway.Contracts;
 

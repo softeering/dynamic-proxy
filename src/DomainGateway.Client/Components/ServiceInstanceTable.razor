@@ -1,7 +1,7 @@
 @using DomainGateway.Client.Core.Models
 @inject HttpClient Http
 
-<div style="margin-bottom: 50px;">
+<div style="margin: 20px;">
 	<h3>@this.ServiceName&nbsp;(@Instances.Count)</h3>
 	<table class="table">
 		<thead>
@@ -10,6 +10,8 @@
 			<th>Host</th>
 			<th>Port</th>
 			<th>Version</th>
+			<th>Registered At</th>
+			<th>Last Seen At</th>
 			<th>Actions</th>
 		</tr>
 		</thead>
@@ -21,6 +23,8 @@
 				<td>@instance.Host</td>
 				<td>@instance.Port</td>
 				<td>@instance.ServiceVersion</td>
+				<td>@instance.RegistrationTime.ToString("yyyy-MM-dd HH:mm:ss zzz")</td>
+				<td>@instance.LastSeenTime.ToString("yyyy-MM-dd HH:mm:ss zzz")</td>
 				<td>
 					<button class="btn btn-sm btn-outline-danger"
 					        @onclick="() => this.DeregisterInstanceAsync(instance)"
@@ -47,11 +51,11 @@
 	public string ServiceName { get; set; } = string.Empty;
 
 	[Parameter]
-	public List<ServiceInstance> Instances { get; set; } = [];
+	public List<ServiceInstanceEntity> Instances { get; set; } = [];
 
 	private readonly HashSet<string> _deregisteringInstances = new();
 
-	private async Task DeregisterInstanceAsync(ServiceInstance instance)
+	private async Task DeregisterInstanceAsync(ServiceInstanceEntity instance)
 	{
 		if (this._deregisteringInstances.Contains(instance.InstanceId))
 			return;

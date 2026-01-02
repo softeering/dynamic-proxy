@@ -9,6 +9,7 @@ using DomainGateway.Configurations;
 using DomainGateway.Contracts;
 using DomainGateway.Database;
 using DomainGateway.Infrastructure;
+using DomainGateway.RateLimiting;
 using DomainGateway.ServiceDiscovery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -54,32 +55,39 @@ builder.Services.AddDbContext<DomainGatewayDbContext>();
 // Add rate limiting configuration
 builder.Services.AddRateLimiter(options =>
 {
-	options.AddPolicy("SlidingWindowPerClientId", context =>
+	options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+	options.AddPolicy(RateLimiterConfiguration.SlidingWindowRateLimiterPolicyName, context =>
 	{
 		// Extract clientId from header, fallback unknown if not present
-		var clientId = context.Request.Headers[configuration.ClientIdHeaderName].FirstOrDefault() ?? "unknown";
+		var clientId = context.Request.Headers[RateLimiterConfiguration.ClientIdHeaderName].FirstOrDefault() ??
+		               RateLimiterConfiguration.FallbackClientIdHeaderValue;
 		var configProvider = context.RequestServices.GetRequiredService<IGatewayConfigurationService>();
-		var config = configProvider.GetRateLimiterConfiguration().ConfigurationByClient.TryGetValue(clientId, out var configValue)
-			? configValue
-			: ThrottlingConfig.DefaultDisabledConfig;
+		var (defaultConfig, pathSpecificConfig) = configProvider.GetRateLimiterConfiguration().GetApplicableConfig(clientId, context.Request.Path);
 
-		if (config.Disabled)
+		if (pathSpecificConfig?.Disabled == true || defaultConfig.Disabled)
 			return RateLimitPartition.GetNoLimiter(clientId);
 
-		return RateLimitPartition.GetSlidingWindowLimiter(clientId, _ => new SlidingWindowRateLimiterOptions
-		{
-			PermitLimit = config.PermitLimit,
-			Window = config.PermitLimitWindow,
-			SegmentsPerWindow = config.SegmentsPerWindow,
-			QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-			QueueLimit = config.QueueLimit
-		});
+		var partitionKey = pathSpecificConfig is null ? clientId : $"{clientId}__{context.Request.Path}";
+		var applicableConfig = pathSpecificConfig ?? defaultConfig;
+
+		return RateLimitPartition.GetSlidingWindowLimiter(
+			partitionKey: partitionKey,
+			factory: _ => new SlidingWindowRateLimiterOptions
+			{
+				PermitLimit = applicableConfig.PermitLimit,
+				Window = applicableConfig.PermitLimitWindow,
+				SegmentsPerWindow = applicableConfig.SegmentsPerWindow,
+				QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+				QueueLimit = applicableConfig.QueueLimit
+			}
+		);
 	});
 
 	options.OnRejected = (context, _) =>
 	{
 		// TODO add open telemetry event
-		// var clientId = context.HttpContext.Request.Headers[configuration.ClientIdHeaderName].FirstOrDefault() ?? "unknown";
+		// var clientId = context.HttpContext.Request.Headers[RateLimiter.ClientIdHeaderName].FirstOrDefault() ?? "unknown";
 		context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
 		return ValueTask.CompletedTask;
 	};
@@ -106,6 +114,16 @@ else
 	throw new Exception("No Gateway configuration provider found in setup.");
 }
 
+/*
+builder.Services.AddAuthorization(options =>
+{
+	options.AddPolicy(
+		ClientIdHeaderRequirementHandler.PolicyName,
+		policy => policy.Requirements.Add(new ClientIdHeaderRequirement(RateLimiterConfiguration.ClientIdHeaderName))
+	);
+});
+*/
+
 builder.Services.AddReverseProxy()
 	.ConfigureHttpClient((context, handler) =>
 	{
@@ -125,15 +143,9 @@ builder.Services.AddReverseProxy()
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
+builder.Services.AddScoped<ClientIdHeaderFilter>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IServiceDiscoveryInstancesRepository, InstancesDatabaseRepository>();
-builder.Services.AddAuthorization(options =>
-{
-	options.AddPolicy(
-		ClientIdHeaderRequirementHandler.PolicyName,
-		policy => policy.Requirements.Add(new ClientIdHeaderRequirement(configuration.ClientIdHeaderName))
-	);
-});
 builder.Services.AddSingleton<IAuthorizationHandler, ClientIdHeaderRequirementHandler>();
 builder.Services.AddSingleton<GatewayConfigurationService>();
 builder.Services.AddSingleton<IGatewayConfigurationService>(sp => sp.GetRequiredService<GatewayConfigurationService>());
@@ -158,8 +170,10 @@ app.Services.GetScopedService(out DomainGatewayDbContext dbContext).Using(_ =>
 
 // await app.Services.GetRequiredService<IGatewayConfigurationProvider>().RefreshProxyConfigurationAsync();
 app.UseExceptionHandler();
-app.UseRateLimiter();
-app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
+// TODO to be tested. This will apply rate limiting to the reverse proxy only and in the correct order from a middleware perspective
+// app.UseRateLimiter();
+// app.MapReverseProxy().RequireRateLimiting("SlidingWindowPerClientId");
+app.MapReverseProxy(proxy => { proxy.UseRateLimiter(); });
 app.MapControllers();
 app.MapGet("/info", () => Results.Ok(new
 {

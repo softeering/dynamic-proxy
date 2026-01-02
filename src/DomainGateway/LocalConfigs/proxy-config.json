@@ -13,7 +13,10 @@
 				{
 					"PathRemovePrefix": "/proxied"
 				}
-			]
+			],
+			"Metadata": {
+				"EnableRateLimiting": "SlidingWindowPerClientId"
+			}
 		},
 		{
 			"RouteId": "exchangeRateHttpRoute",
@@ -28,13 +31,19 @@
 				{
 					"PathPattern": "/exchangerate"
 				}
-			]
+			],
+			"Metadata": {
+				"EnableRateLimiting": "SlidingWindowPerClientId"
+			}
 		},
 		{
 			"RouteId": "exchangeRateGrpcRoute",
 			"ClusterId": "exchangeRateGrpcCluster",
 			"Match": {
 				"Path": "/softeering.ExchangeRate/{**catch-all}"
+			},
+			"Metadata": {
+				"EnableRateLimiting": "SlidingWindowPerClientId"
 			}
 		}
 	],

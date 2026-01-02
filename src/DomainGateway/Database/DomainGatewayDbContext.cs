@@ -1,3 +1,4 @@
+using DomainGateway.Client.Core.Models;
 using DomainGateway.ServiceDiscovery;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

@@ -1,6 +1,7 @@
 using DomainGateway.Configurations;
 using Amazon.S3;
 using DomainGateway.Contracts;
+using DomainGateway.RateLimiting;
 using Yarp.ReverseProxy.Configuration;
 
 namespace DomainGateway.ConfigurationProviders.AwsS3;

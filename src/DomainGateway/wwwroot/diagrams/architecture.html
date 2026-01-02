@@ -1,0 +1,30 @@
+<div class="mermaid">
+	graph LR
+	subgraph Clients
+	C1[Client: Web App]
+	C2[Client: Mobile]
+	C3[Client: Service-to-Service]
+	end
+
+	C1 -->|HTTPS| DG[Domain Gateway]
+	C2 -->|HTTPS| DG
+	C3 -->|gRPC / HTTP| DG
+
+	DG --> RL[Throttling & Rate Limiting<br/>Client-Id Header]
+	DG --> RP[Reverse Proxy<br/>YARP]
+	DG --> SD[Service Discovery<br/>gRPC-first]
+
+	subgraph Internal Services
+	S1[DomainServiceGrpc]
+	S2[DomainServiceHttp/RPC]
+	end
+
+	RP --> S1
+	RP --> S2
+	SD -.-> S1
+</div>
+<style>
+	.mermaid {
+		text-align: center;
+	}
+</style>

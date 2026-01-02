@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DomainGateway.ServiceDiscovery;
 
 // [Authorize(Policy = ClientIdHeaderRequirementHandler.PolicyName)]
+[ServiceFilter(typeof(ClientIdHeaderFilter))]
 [ApiController]
 [Route("api/[controller]")]
 public class ServiceDiscoveryController(ILogger<ServiceDiscoveryController> logger, IServiceDiscoveryInstancesRepository repository) : ControllerBase
@@ -14,21 +15,21 @@ public class ServiceDiscoveryController(ILogger<ServiceDiscoveryController> logg
 	public async Task<IActionResult> GetInstances(CancellationToken cancellationToken)
 	{
 		var instances = await repository.GetAllRegisteredInstancesAsync(cancellationToken);
-		return Ok(instances.Select(i => i.ToServiceInstance()));
+		return Ok(instances);
 	}
 
 	[HttpGet("{serviceName}/instances")]
 	public async Task<IActionResult> GetServiceInstances(string serviceName, CancellationToken cancellationToken)
 	{
 		var instances = await repository.GetRegisteredInstancesAsync(serviceName, cancellationToken);
-		return Ok(instances.Select(i => i.ToServiceInstance()));
+		return Ok(instances);
 	}
 
 	[HttpGet("{serviceName}/instances/{instanceId}")]
 	public async Task<IActionResult> GetServiceInstance(string serviceName, string instanceId, CancellationToken cancellationToken)
 	{
 		var instance = await repository.GetRegisteredInstanceAsync(serviceName, instanceId, cancellationToken);
-		return instance is null ? NotFound() : Ok(instance.ToServiceInstance());
+		return instance is null ? NotFound() : Ok(instance);
 	}
 
 	[HttpDelete("{serviceName}/{instanceId}")]

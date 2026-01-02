@@ -8,14 +8,8 @@
 
 <div class="d-flex align-items-center justify-content-between mb-3">
 	<h1 class="mb-0">Services</h1>
-	<button class="btn btn-outline-primary btn-sm"
-	        @onclick="this.LoadServicesAsync"
-	        disabled="@this._isLoading">
-		<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-1">
-			<path d="M2 7a6 6 0 1 1 1.757 4.243" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-			<path d="M2 11.5V7H6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-		</svg>
-		Refresh
+	<button class="btn btn-outline-primary btn-sm" @onclick="this.LoadServicesAsync" disabled="@this._isLoading">
+		<span class="bi bi-arrow-clockwise"></span>Refresh
 	</button>
 </div>
 
@@ -32,13 +26,13 @@
 	{
 		@foreach (var (serviceName, instances) in this._services)
 		{
-			<ServiceInstanceTable ServiceName="@serviceName" Instances="@instances.ToList()"/>
+			<ServiceInstanceTable ServiceName="@serviceName" Instances="@instances"/>
 		}
 	}
 </div>
 
 @code {
-	private Dictionary<string, ServiceInstance[]>? _services;
+	private Dictionary<string, List<ServiceInstanceEntity>>? _services;
 	private string? _message;
 	private bool _isLoading;
 
@@ -54,7 +48,7 @@
 
 		try
 		{
-			var result = await Http.GetFromJsonAsync<List<ServiceInstance>>("api/servicediscovery/instances");
+			var result = await Http.GetFromJsonAsync<List<ServiceInstanceEntity>>("api/servicediscovery/instances");
 
 			if (result is null || result.Count == 0)
 			{
@@ -66,7 +60,7 @@
 				this._services = result
 					.GroupBy(s => s.ServiceName)
 					.OrderBy(s => s.Key)
-					.ToDictionary(s => s.Key, s => s.ToArray());
+					.ToDictionary(s => s.Key, s => s.ToList());
 			}
 		}
 		catch (Exception ex)

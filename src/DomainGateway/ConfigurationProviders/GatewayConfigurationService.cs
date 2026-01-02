@@ -1,6 +1,7 @@
 using DomainGateway.Configurations;
 using DomainGateway.Contracts;
 using DomainGateway.Infrastructure;
+using DomainGateway.RateLimiting;
 using DomainGateway.ServiceDiscovery;
 using Yarp.ReverseProxy.Configuration;
 

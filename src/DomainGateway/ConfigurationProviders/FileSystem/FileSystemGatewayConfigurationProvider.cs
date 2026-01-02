@@ -1,6 +1,7 @@
 using DomainGateway.Configurations;
 using System.Text.Json;
 using DomainGateway.Contracts;
+using DomainGateway.RateLimiting;
 
 namespace DomainGateway.ConfigurationProviders.FileSystem;
 
