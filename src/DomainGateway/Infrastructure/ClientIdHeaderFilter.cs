@@ -11,7 +11,7 @@ public sealed class ClientIdHeaderFilter : IAsyncActionFilter
 		if (!context.HttpContext.Request.Headers.TryGetValue(RateLimiterConfiguration.ClientIdHeaderName, out var value) ||
 		    string.IsNullOrWhiteSpace(value))
 		{
-			context.Result = new BadRequestObjectResult($"Missing required header '{RateLimiterConfiguration.ClientIdHeaderName}'.");
+			context.Result = new BadRequestObjectResult(new { Error = $"Missing required header '{RateLimiterConfiguration.ClientIdHeaderName}'." });
 			return;
 		}
 

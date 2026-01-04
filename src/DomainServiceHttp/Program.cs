@@ -1,27 +1,29 @@
+using System.Net;
 using DomainGateway.ServiceDiscovery.Client.Configuration;
 using DomainGateway.ServiceDiscovery.Client.Utils;
+using DomainServiceHttp;
 using Microsoft.AspNetCore.Mvc;
-
-const string defaultFromCurrency = "USD";
 
 var builder = WebApplication.CreateBuilder(args);
 
 var serviceDiscoConfiguration = builder.Configuration.GetSection("ServiceDiscovery").Get<ServiceDiscoveryConfiguration>()!;
 builder.Services.AddServiceDiscoveryClientWithRegistry(serviceDiscoConfiguration, HostHelper.GetLocalIPv4()?.ToString());
 
+var address = HostHelper.GetLocalIPv4();
+if (address is not null && Equals(address, IPAddress.Loopback))
+	builder.Services.AddSingleton<IExchangeRateRepository, OfflineExchangeRateRepository>();
+else
+	builder.Services.AddSingleton<IExchangeRateRepository, OnlineExchangeRateRepository>();
+
 var app = builder.Build();
 
-app.MapGet("/exchangerate", async ([FromQuery] string? fromCurrency = null) =>
+app.MapGet("/exchangerate", async (IExchangeRateRepository exchangeRateRepository, [FromQuery] string? fromCurrency = null) =>
 	{
-		var url = "https://open.er-api.com/v6/latest/" + (fromCurrency ?? defaultFromCurrency);
-		using var client = new HttpClient();
-		var response = await client.GetFromJsonAsync<ExchangeRateModel>(url);
-		return response;
+		var result = await exchangeRateRepository.GetExchangeRate(fromCurrency);
+		return result;
 	})
 	.WithName("get-exchange-rates");
 
 app.MapGet("/health", () => Results.Ok(new { Healthy = true })).WithName("health-indicator");
 
 await app.RunAsync();
-
-record ExchangeRateModel(Dictionary<string, decimal> Rates);

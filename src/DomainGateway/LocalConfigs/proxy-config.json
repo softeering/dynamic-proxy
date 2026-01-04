@@ -59,18 +59,19 @@
 		{
 			"ClusterId": "exchangeRateHttpCluster",
 			"Metadata": {
+				"ServiceDiscoveryTarget": "domain-service-http",
 				"ConsecutiveFailuresHealthPolicy.Threshold": "3"
 			},
 			"Destinations": {
 				"exchangeRateService": {
-					"Address": "https://localhost:7002"
+					"Address": "https://{{HOST}}:{{PORT}}"
 				}
 			},
 			"HealthCheck": {
 				"Active": {
-					"Enabled": false,
-					"Interval": "00:00:10",
-					"Timeout": "00:00:10",
+					"Enabled": true,
+					"Interval": "00:00:15",
+					"Timeout": "00:00:05",
 					"Policy": "ConsecutiveFailures",
 					"Path": "/health"
 				}
@@ -93,9 +94,9 @@
 			},
 			"HealthCheck": {
 				"Active": {
-					"Enabled": false,
-					"Interval": "00:00:10",
-					"Timeout": "00:00:10",
+					"Enabled": true,
+					"Interval": "00:00:15",
+					"Timeout": "00:00:05",
 					"Policy": "ConsecutiveFailures",
 					"Path": "/health"
 				}

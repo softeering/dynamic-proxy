@@ -27,7 +27,10 @@ public sealed class ServiceDiscoveryHttpClient : IServiceDiscoveryClient
 	{
 		try
 		{
-			await this._httpClient.PutAsJsonAsync($"api/servicediscovery/{instance.ServiceName}/ping", instance, cancellationToken).ConfigureAwait(false);
+			var pingResponse = await this._httpClient
+				.PutAsJsonAsync($"api/servicediscovery/{instance.ServiceName}/ping", instance, cancellationToken)
+				.ConfigureAwait(false);
+			pingResponse.EnsureSuccessStatusCode();
 		}
 		catch (Exception exception)
 		{

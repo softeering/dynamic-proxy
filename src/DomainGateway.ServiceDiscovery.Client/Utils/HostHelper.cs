@@ -12,10 +12,12 @@ public static class HostHelper
 		if (!NetworkInterface.GetIsNetworkAvailable())
 			return null;
 
+		IPAddress? result = null;
+
 		if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 		{
 			// Dns.GetHostEntry fails on MacOS due to a Dns resolution failure against localhost
-			return NetworkInterface.GetAllNetworkInterfaces()
+			result = NetworkInterface.GetAllNetworkInterfaces()
 				.FirstOrDefault(n =>
 					n is
 					{
@@ -27,10 +29,19 @@ public static class HostHelper
 				.GetIPProperties()
 				.UnicastAddresses.First().Address;
 		}
+		else
+		{
+			var hostName = Dns.GetHostName();
+			result = Dns.GetHostEntry(hostName)
+				.AddressList
+				.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip));
+		}
 
-		var hostName = Dns.GetHostName();
-		return Dns.GetHostEntry(hostName)
-			.AddressList
-			.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip));
+#if DEBUG
+		// just in case we're in debug mode (development) and we have no network at all (I'm working from the plane)
+		result ??= IPAddress.Loopback;
+#endif
+
+		return result;
 	}
 }

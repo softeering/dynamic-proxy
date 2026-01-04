@@ -1,29 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <Protobuf Include="Protos\exchangerate.proto" GrpcServices="Server" Options="nullable_enable" />
-    </ItemGroup>
+	<ItemGroup>
+		<Protobuf Include="Protos\exchangerate.proto" GrpcServices="Server" Options="nullable_enable"/>
+	</ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Grpc.AspNetCore" Version="2.76.0" />
-        <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.76.0" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Grpc.AspNetCore" Version="2.76.0"/>
+		<PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.76.0"/>
+	</ItemGroup>
 
-    <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
+	<ItemGroup>
+		<Content Include="..\.dockerignore">
+			<Link>.dockerignore</Link>
+		</Content>
+		<Compile Include="..\DomainServiceHttp\ExchangeRateRepository.cs">
+			<Link>ExchangeRateRepository.cs</Link>
+		</Compile>
+	</ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\DomainGateway.ServiceDiscovery.Client\DomainGateway.ServiceDiscovery.Client.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\DomainGateway.ServiceDiscovery.Client\DomainGateway.ServiceDiscovery.Client.csproj"/>
+	</ItemGroup>
 
 </Project>

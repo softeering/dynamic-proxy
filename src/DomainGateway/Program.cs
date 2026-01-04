@@ -114,16 +114,6 @@ else
 	throw new Exception("No Gateway configuration provider found in setup.");
 }
 
-/*
-builder.Services.AddAuthorization(options =>
-{
-	options.AddPolicy(
-		ClientIdHeaderRequirementHandler.PolicyName,
-		policy => policy.Requirements.Add(new ClientIdHeaderRequirement(RateLimiterConfiguration.ClientIdHeaderName))
-	);
-});
-*/
-
 builder.Services.AddReverseProxy()
 	.ConfigureHttpClient((context, handler) =>
 	{
@@ -146,11 +136,9 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ClientIdHeaderFilter>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IServiceDiscoveryInstancesRepository, InstancesDatabaseRepository>();
-builder.Services.AddSingleton<IAuthorizationHandler, ClientIdHeaderRequirementHandler>();
 builder.Services.AddSingleton<GatewayConfigurationService>();
 builder.Services.AddSingleton<IGatewayConfigurationService>(sp => sp.GetRequiredService<GatewayConfigurationService>());
 builder.Services.AddSingleton<IProxyConfigProvider>(sp => sp.GetRequiredService<GatewayConfigurationService>());
-
 builder.Services.AddHostedService<InstanceCleanUpJob>();
 builder.Services.AddHostedService<GatewayConfigurationSyncJob>();
 
@@ -182,7 +170,6 @@ app.MapGet("/info", () => Results.Ok(new
 	Description = "...."
 }));
 app.MapDefaultEndpoints();
-app.MapStaticAssets();
 
 if (configuration.ExposeConfigurationEndpoints)
 {
@@ -206,11 +193,12 @@ else
 	app.UseHsts();
 }
 
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+// app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
 if (configuration.EnableAdminPortal)
 {
 	app.UseAntiforgery();
+	app.MapStaticAssets();
 	app.MapRazorComponents<App>()
 		.AddInteractiveWebAssemblyRenderMode()
 		.AddAdditionalAssemblies(typeof(DomainGateway.Client._Imports).Assembly);

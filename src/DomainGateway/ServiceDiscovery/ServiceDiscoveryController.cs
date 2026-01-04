@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DomainGateway.ServiceDiscovery;
 
-// [Authorize(Policy = ClientIdHeaderRequirementHandler.PolicyName)]
 [ServiceFilter(typeof(ClientIdHeaderFilter))]
 [ApiController]
 [Route("api/[controller]")]

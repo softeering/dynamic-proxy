@@ -9,6 +9,11 @@ public class FileSystemGatewayConfigurationProvider(
 	ILogger<FileSystemGatewayConfigurationProvider> logger,
 	FileSystemRepositorySetup setup) : IGatewayConfigurationProvider
 {
+	private static readonly JsonSerializerOptions JsonOptions = new()
+	{
+		ReadCommentHandling = JsonCommentHandling.Skip
+	};
+
 	// Proxy Configuration
 
 	public Task<ProxyConfig> LoadProxyConfigurationAsync(CancellationToken cancellationToken = default)
@@ -54,7 +59,7 @@ public class FileSystemGatewayConfigurationProvider(
 	private static async Task<T> LoadFile<T>(string filePath)
 	{
 		await using var fileContent = File.OpenRead(filePath);
-		return await JsonSerializer.DeserializeAsync<T>(fileContent).ConfigureAwait(false)
+		return await JsonSerializer.DeserializeAsync<T>(fileContent, JsonOptions).ConfigureAwait(false)
 		       ?? throw new InvalidOperationException($"Failed to deserialize configuration from file: {filePath}");
 	}
 }
