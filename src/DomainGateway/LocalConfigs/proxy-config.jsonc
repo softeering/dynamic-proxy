@@ -37,6 +37,24 @@
 			}
 		},
 		{
+			"RouteId": "updateExchangeRateHttpRoute",
+			"ClusterId": "exchangeRateHttpCluster",
+			"Match": {
+				"Path": "/api/exchangerate",
+				"Methods": [
+					"POST"
+				]
+			},
+			"Transforms": [
+				{
+					"PathPattern": "/exchangerate"
+				}
+			],
+			"Metadata": {
+				"EnableRateLimiting": "SlidingWindowPerClientId"
+			}
+		},
+		{
 			"RouteId": "exchangeRateGrpcRoute",
 			"ClusterId": "exchangeRateGrpcCluster",
 			"Match": {
@@ -59,7 +77,7 @@
 		{
 			"ClusterId": "exchangeRateHttpCluster",
 			"Metadata": {
-				"ServiceDiscoveryTarget": "domain-service-http",
+				// "ServiceDiscoveryTarget": "domain-service-http",
 				"ConsecutiveFailuresHealthPolicy.Threshold": "3"
 			},
 			"Destinations": {

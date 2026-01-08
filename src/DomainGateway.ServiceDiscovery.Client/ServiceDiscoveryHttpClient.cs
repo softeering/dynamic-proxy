@@ -1,15 +1,18 @@
 ﻿using System.Net.Http.Json;
 using DomainGateway.Client.Core.Models;
 using DomainGateway.ServiceDiscovery.Client.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace DomainGateway.ServiceDiscovery.Client;
 
 public sealed class ServiceDiscoveryHttpClient : IServiceDiscoveryClient
 {
+	private readonly ILogger<ServiceDiscoveryHttpClient> _logger;
 	private readonly HttpClient _httpClient;
 
-	public ServiceDiscoveryHttpClient(HttpClient httpClient)
+	public ServiceDiscoveryHttpClient(ILogger<ServiceDiscoveryHttpClient> logger, HttpClient httpClient)
 	{
+		this._logger = logger;
 		this._httpClient = httpClient;
 	}
 
@@ -35,6 +38,7 @@ public sealed class ServiceDiscoveryHttpClient : IServiceDiscoveryClient
 		catch (Exception exception)
 		{
 			// Swallow exceptions for ping failures
+			this._logger.LogError(exception, "Ping failed for instance {InstanceId}", instance);
 		}
 	}
 

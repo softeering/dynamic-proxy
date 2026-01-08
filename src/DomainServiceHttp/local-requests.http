@@ -1,7 +1,26 @@
 @baseUrl = https://localhost:7002
 
 ###################
-### exchangerate api
+### get rates for default currency 
 ###################
 GET {{baseUrl}}/exchangerate
 Accept: application/json
+
+###################
+### get rate for EUR
+###################
+GET {{baseUrl}}/exchangerate?fromCurrency=EUR
+Accept: application/json
+
+###################
+### update rate from EUR to USD
+###################
+POST {{baseUrl}}/exchangerate
+Accept: application/json
+Content-Type: application/json
+
+{
+  "fromCurrency": "EUR",
+  "toCurrency": "USD",
+  "rate": 1.1
+}

@@ -2,6 +2,8 @@ namespace DomainServiceHttp;
 
 public record ExchangeRateModel(Dictionary<string, decimal> Rates);
 
+public record ExchangeRateUpdateModel(string FromCurrency, string ToCurrency, decimal Rate);
+
 public interface IExchangeRateRepository
 {
 	Task<ExchangeRateModel> GetExchangeRate(string? fromCurrency = null, CancellationToken cancellationToken = default);
