@@ -57,10 +57,8 @@
 
 	private async Task DeregisterInstanceAsync(ServiceInstanceEntity instance)
 	{
-		if (this._deregisteringInstances.Contains(instance.InstanceId))
+		if (!this._deregisteringInstances.Add(instance.InstanceId))
 			return;
-
-		this._deregisteringInstances.Add(instance.InstanceId);
 
 		try
 		{
@@ -78,4 +76,5 @@
 			this._deregisteringInstances.Remove(instance.InstanceId);
 		}
 	}
+
 }

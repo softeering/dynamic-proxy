@@ -1,7 +1,6 @@
 using System.Text.Json;
 using DomainGateway.Client.Core.Models;
 using DomainGateway.Database;
-using DomainGateway.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 namespace DomainGateway.ServiceDiscovery;
@@ -49,13 +48,16 @@ public class InstancesDatabaseRepository(ILogger<InstancesDatabaseRepository> lo
 		}
 	}
 
-	public Task DeregisterInstanceAsync(string serviceName, string instanceId, CancellationToken cancellationToken = default)
+	public async Task DeregisterInstanceAsync(string serviceName, string instanceId, CancellationToken cancellationToken = default)
 	{
 		var serviceNameFilter = serviceName.ToLower();
 
-		return database.Instances
+		var deleted = await database.Instances
 			.Where(i => i.ServiceName.Equals(serviceNameFilter) && i.InstanceId.Equals(instanceId))
-			.ExecuteDeleteAsync(cancellationToken);
+			.ExecuteDeleteAsync(cancellationToken).ConfigureAwait(false);
+
+		logger.LogInformation("event=instanceDeregistered, instance deregistration for: {ServiceName}/{InstanceId}. DeletedCount={DeletedCount}",
+			serviceName, instanceId, deleted);
 	}
 
 	public async Task PingAsync(ServiceInstance instance, CancellationToken cancellationToken = default)

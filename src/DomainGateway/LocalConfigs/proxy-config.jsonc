@@ -77,12 +77,13 @@
 		{
 			"ClusterId": "exchangeRateHttpCluster",
 			"Metadata": {
-				// "ServiceDiscoveryTarget": "domain-service-http",
+				"ServiceDiscoveryTarget": "domain-service-http",
 				"ConsecutiveFailuresHealthPolicy.Threshold": "3"
 			},
 			"Destinations": {
 				"exchangeRateService": {
 					"Address": "https://{{HOST}}:{{PORT}}"
+					// "Address": "https://localhost:7002"
 				}
 			},
 			"HealthCheck": {

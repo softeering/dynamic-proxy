@@ -122,11 +122,11 @@ builder.Services.AddReverseProxy()
 	})
 	.AddTransforms(builderContext =>
 	{
-		builderContext.AddRequestTransform(async transformContext =>
+		builderContext.AddRequestTransform(transformContext =>
 		{
 			var request = transformContext.HttpContext.Request;
 			Console.WriteLine($"YARP Request handling: {request.HttpContext} mapped to {transformContext.DestinationPrefix}");
-			await Task.CompletedTask;
+			return ValueTask.CompletedTask;
 		});
 	}); //.LoadFromMemory([], []);
 

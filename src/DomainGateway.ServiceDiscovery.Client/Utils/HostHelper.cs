@@ -23,8 +23,10 @@ public static class HostHelper
 					{
 						OperationalStatus: OperationalStatus.Up,
 						NetworkInterfaceType: NetworkInterfaceType.Ethernet or NetworkInterfaceType.Wireless80211,
-						Speed: > 0
-					} && n.GetIPProperties().UnicastAddresses.Any(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
+						Speed: > 0,
+					}
+					&& n.GetIPProperties().UnicastAddresses.Any(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork
+					                                                    && addr.ToString().IndexOf(';') < 0)
 				)?
 				.GetIPProperties()
 				.UnicastAddresses.First().Address;
@@ -34,7 +36,10 @@ public static class HostHelper
 			var hostName = Dns.GetHostName();
 			result = Dns.GetHostEntry(hostName)
 				.AddressList
-				.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip));
+				.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork
+				                      && !IPAddress.IsLoopback(ip)
+				                      // not an IP v6 address
+				                      && ip.ToString().IndexOf(':') < 0);
 		}
 
 #if DEBUG

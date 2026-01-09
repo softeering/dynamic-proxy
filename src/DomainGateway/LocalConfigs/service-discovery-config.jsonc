@@ -4,7 +4,15 @@
 	],
 	"RegisteredServices": [
 		{
-			"Name": "exchange-rate-grpc",
+			"Name": "domain-service-grpc",
+			"Description": "A service to retrieve exchange rate from a given currency",
+			"OwnerEmail": "someone@example.com",
+			"InstancesHeartbeatInterval": "00:00:15",
+			"MaxHeartbeatIntervalMiss": 3,
+			"AutoDeregistration": "DryRun"
+		},
+		{
+			"Name": "exchange-rate-http",
 			"Description": "A service to retrieve exchange rate from a given currency",
 			"OwnerEmail": "someone@example.com",
 			"InstancesHeartbeatInterval": "00:00:15",
